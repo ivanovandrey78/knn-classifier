@@ -11,6 +11,8 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(tests 
     point_ut.cpp
+    dataset_ut.cpp
+    knn_ut.cpp
 )
 
 target_link_libraries(tests
