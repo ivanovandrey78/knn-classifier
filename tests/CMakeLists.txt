@@ -10,7 +10,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 add_executable(tests 
-    # tests
+    point_ut.cpp
 )
 
 target_link_libraries(tests
