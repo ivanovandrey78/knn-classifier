@@ -2,6 +2,7 @@
 #define POINT_HPP
 
 #include <cmath>
+#include <ostream>
 
 /**
  * @brief Represents a 2D point with coordinates and class label
@@ -24,6 +25,33 @@ public:
         double dx = x - other.x;
         double dy = y - other.y;
         return std::sqrt(dx * dx + dy * dy);
+    }
+
+    /**
+     * @brief Equality operator with epsilon comparison for floating point
+     * @param other The other point
+     * @return true if points are equal within epsilon
+     */
+    bool operator==(const Point& other) const {
+        const double epsilon = 1e-9;
+        return std::abs(x - other.x) < epsilon && 
+               std::abs(y - other.y) < epsilon && 
+               label == other.label;
+    }
+
+    /**
+     * @brief Inequality operator
+     */
+    bool operator!=(const Point& other) const {
+        return !(*this == other);
+    }
+
+    /**
+     * @brief Stream output operator for easy printing
+     */
+    friend std::ostream& operator<<(std::ostream& os, const Point& p) {
+        os << "Point(" << p.x << ", " << p.y << ", label=" << p.label << ")";
+        return os;
     }
 };
 
