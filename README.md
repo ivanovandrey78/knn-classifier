@@ -8,6 +8,7 @@ A K-Nearest Neighbors classifier implementation in C++20 with ASCII-based consol
 - Synthetic dataset generation
 - Console-based visualization using ASCII graphics and ANSI colors
 - Interactive mode for testing predictions
+- Comprehensive unit tests with Google Test
 
 ## Requirements
 
@@ -19,13 +20,21 @@ A K-Nearest Neighbors classifier implementation in C++20 with ASCII-based consol
 
 ```
 .
-├── CMakeLists.txt      # Build configuration
-├── main.cpp            # Entry point
-├── point.hpp           # Point class definition
-├── knn.hpp             # KNN classifier header
-├── knn.cpp             # KNN classifier implementation
-├── visualizer.hpp      # Console visualization header
-└── README.md           # This file
+├── CMakeLists.txt          # Root build configuration
+├── bin/
+│   ├── CMakeLists.txt      # Executable build config
+│   └── main.cpp            # Entry point
+├── include/
+│   ├── point.hpp           # Point class definition
+│   ├── knn.hpp             # KNN classifier header
+│   └── visualizer.hpp      # Console visualization header
+├── src/
+│   ├── CMakeLists.txt      # Library build config
+│   └── knn.cpp             # KNN classifier implementation
+├── tests/
+│   ├── CMakeLists.txt      # Test build config
+│   └── test_point.cpp      # Point class unit tests
+└── README.md               # This file
 ```
 
 ## Build Instructions
@@ -41,7 +50,22 @@ cmake ..
 cmake --build .
 
 # Run the executable
-./knn_classifier
+./bin/knn-classifier
+```
+
+### Build with tests
+
+```bash
+# Configure with tests enabled
+cmake -DBUILD_TESTS=ON ..
+
+# Build
+cmake --build .
+
+# Run tests
+ctest --output-on-failure
+# or directly
+./tests/tests
 ```
 
 ### Build with specific compiler
@@ -59,19 +83,31 @@ cmake -DCMAKE_CXX_COMPILER=g++ ..
 *(Will be updated as features are implemented)*
 
 ```bash
-./knn_classifier
+./bin/knn-classifier
 ```
 
 ## Development Progress
 
 - [x] Step 1: Project setup and structure
-- [ ] Step 2: Point data structure implementation
+- [x] Step 2: Point data structure implementation
+  - Point class with x, y coordinates and label
+  - Euclidean distance calculation
+  - Equality operators and stream output
+  - Comprehensive unit tests (Google Test)
+  - Simple assertion tests in main
 - [ ] Step 3: Synthetic dataset generation
 - [ ] Step 4: KNN algorithm implementation
 - [ ] Step 5: Console visualization
 - [ ] Step 6: Interactive mode
 - [ ] Step 7: Optimizations
 - [ ] Step 8: Final documentation
+
+## Testing
+
+The project includes two levels of testing:
+
+1. **Unit Tests (Google Test)**: Run comprehensive tests with `ctest` or `./tests/tests`
+2. **Integration Tests**: Simple assert-based tests in `main.cpp`
 
 ## License
 
