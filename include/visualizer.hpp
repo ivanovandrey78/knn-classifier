@@ -72,7 +72,7 @@ std::string getColorForLabel(int label, bool useBackground = false);
  * @param label Class label
  * @return Character to represent the class
  */
-const char* getCharForLabel(int label);
+char getCharForLabel(int label);
 
 /**
  * @brief Draw a map of the classification space (decision boundary)

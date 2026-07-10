@@ -37,17 +37,9 @@ std::string getColorForLabel(int label, bool useBackground) {
     }
 }
 
-const char* getCharForLabel(int label) {
-#ifdef _WIN32
-    static const char* symbols[] = {
-        "O", "#", "^", "*", "+", "X", "V", "<", ">", "@"
-    };
-#else
-    static const char* symbols[] = {
-        "●", "■", "▲", "♦", "★", "◆", "▼", "◄", "►", "♥"
-    };
-#endif
-    return symbols[label % 10];
+char getCharForLabel(int label) {
+    const char chars[] = {'O', '#', '^', '*', '+', 'X', 'V', '<', '>', '@'};
+    return chars[label % 10];
 }
 
 void drawMap(const KNN& classifier, const VisualizerConfig& config) {
