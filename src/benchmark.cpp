@@ -25,24 +25,24 @@ void printResult(const BenchmarkResult& result) {
 void compareKNNImplementations(
     const std::vector<Point>& trainData,
     const std::vector<Point>& testData, int k) {
-    std::cout << "\n=== KNN Implementation Comparison ==="
+    std::cout << "\n=== Knn Implementation Comparison ==="
               << std::endl;
     std::cout << "Training size: " << trainData.size()
               << ", Test size: " << testData.size()
               << ", k: " << k << std::endl;
     std::cout << std::endl;
 
-    KNN standardKNN(trainData);
+    Knn standard_knn(trainData);
     auto standardResult = measure(
-        "Standard KNN",
-        [&]() { standardKNN.predictBatch(testData, k); },
+        "Standard Knn",
+        [&]() { standard_knn.predictBatch(testData, k); },
         10, trainData.size());
     printResult(standardResult);
 
-    KNNOptimized optimizedKNN(trainData, true);
+    KnnOptimized optimized_knn(trainData, true);
     auto optimizedResult = measure(
-        "Optimized KNN (KD-tree)",
-        [&]() { optimizedKNN.predictBatch(testData, k); },
+        "Optimized Knn (KD-tree)",
+        [&]() { optimized_knn.predictBatch(testData, k); },
         10, trainData.size());
     printResult(optimizedResult);
 
@@ -54,7 +54,7 @@ void compareKNNImplementations(
               << std::endl;
 }
 
-void benchmarkKDTree(
+void benchmarkKdTree(
     const std::vector<Point>& data, int k, size_t numQueries) {
     std::cout << "\n=== KD-Tree vs Linear Search ===" << std::endl;
     std::cout << "Data size: " << data.size()
@@ -71,27 +71,27 @@ void benchmarkKDTree(
     for (size_t i = 0; i < numQueries; ++i)
         queries.emplace_back(distX(gen), distY(gen));
 
-    KNN linearKNN(data);
+    Knn linear_knn(data);
     auto linearResult = measure(
         "Linear Search",
         [&]() {
-            for (const auto& q : queries) linearKNN.predict(q, k);
+            for (const auto& q : queries) linear_knn.predict(q, k);
         },
         10, data.size());
     printResult(linearResult);
 
-    KNNOptimized kdTreeKNN(data, true);
-    auto kdTreeResult = measure(
+    KnnOptimized kd_tree_knn(data, true);
+    auto kd_tree_result = measure(
         "KD-Tree Search",
         [&]() {
-            for (const auto& q : queries) kdTreeKNN.predict(q, k);
+            for (const auto& q : queries) kd_tree_knn.predict(q, k);
         },
         10, data.size());
-    printResult(kdTreeResult);
+    printResult(kd_tree_result);
 
     double speedup
         = linearResult.averageTimeMs
-          / kdTreeResult.averageTimeMs;
+          / kd_tree_result.averageTimeMs;
     std::cout << "\nSpeedup: " << std::fixed
               << std::setprecision(2) << speedup << "x"
               << std::endl;
@@ -106,7 +106,7 @@ void benchmarkParallelization(
               << ", Test size: " << testData.size() << std::endl;
     std::cout << std::endl;
 
-    KNNOptimized classifier(trainData, true);
+    KnnOptimized classifier(trainData, true);
 
     auto seqResult = measure(
         "Sequential",
@@ -157,7 +157,7 @@ void benchmarkWeightStrategies(
         {"Gaussian (σ=2.0)", WeightStrategy::GAUSSIAN, 2.0}};
 
     for (const auto& strat : strategies) {
-        KNNOptimized classifier(trainData, true);
+        KnnOptimized classifier(trainData, true);
         classifier.setWeightStrategy(strat.strategy, strat.sigma);
 
         auto result = measure(
@@ -198,8 +198,8 @@ void runFullSuite(int datasetSize, int testSize) {
         auto [train, test]
             = dataset::trainTestSplit(data, 0.8, true, 42);
 
-        KNN standard(train);
-        KNNOptimized optimized(train, true);
+        Knn standard(train);
+        KnnOptimized optimized(train, true);
 
         Point query(10.0, 10.0);
         auto standardTime = measure(
@@ -227,7 +227,7 @@ void runFullSuite(int datasetSize, int testSize) {
         = dataset::trainTestSplit(fullData, 0.8, true, 42);
 
     compareKNNImplementations(train, test, 5);
-    benchmarkKDTree(train, 5, testSize);
+    benchmarkKdTree(train, 5, testSize);
     benchmarkParallelization(train, test, 5);
     benchmarkWeightStrategies(train, test, 5);
 

@@ -9,43 +9,43 @@
 /**
  * @brief KD-Tree node for 2D points
  */
-struct KDNode {
+struct KdNode {
     Point point;
-    std::unique_ptr<KDNode> left;
-    std::unique_ptr<KDNode> right;
+    std::unique_ptr<KdNode> left;
+    std::unique_ptr<KdNode> right;
     int axis;  // 0 for x, 1 for y
 
-    KDNode(const Point& p, int ax) : point(p), axis(ax) {}
+    KdNode(const Point& p, int ax) : point(p), axis(ax) {}
 };
 
 /**
  * @brief KD-Tree for efficient nearest neighbor search
  */
-class KDTree {
+class KdTree {
 private:
-    std::unique_ptr<KDNode> root;
+    std::unique_ptr<KdNode> root;
     size_t treeSize;
 
     /**
      * @brief Recursively build KD-tree
      */
-    std::unique_ptr<KDNode> buildTree(std::vector<Point>& points, int depth, size_t start,
+    std::unique_ptr<KdNode> buildTree(std::vector<Point>& points, int depth, size_t start,
                                       size_t end);
 
     /**
      * @brief Recursively search for k-nearest neighbors
      */
-    void searchKNearest(const KDNode* node, const Point& target, int k,
+    void searchKNearest(const KdNode* node, const Point& target, int k,
                         std::vector<std::pair<double, Point>>& nearest) const;
 
     /**
      * @brief Search in a range
      */
-    void rangeSearch(const KDNode* node, double minX, double maxX, double minY, double maxY,
+    void rangeSearch(const KdNode* node, double minX, double maxX, double minY, double maxY,
                      std::vector<Point>& results) const;
 
 public:
-    KDTree() : treeSize(0) {}
+    KdTree() : treeSize(0) {}
 
     /**
      * @brief Build tree from points

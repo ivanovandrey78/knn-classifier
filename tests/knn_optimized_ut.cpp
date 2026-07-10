@@ -2,7 +2,7 @@
 #include <knn_optimized.hpp>
 #include <dataset.hpp>
 
-class KNNOptimizedTest : public ::testing::Test {
+class KnnOptimizedTest : public ::testing::Test {
 protected:
     void SetUp() override {
         data = dataset::generateSimpleDataset(50, 42);
@@ -16,10 +16,10 @@ protected:
     std::vector<Point> testData;
 };
 
-TEST_F(KNNOptimizedTest, KDTreePrediction) {
-    KNNOptimized classifier(trainData, true);
+TEST_F(KnnOptimizedTest, KdTreePrediction) {
+    KnnOptimized classifier(trainData, true);
 
-    EXPECT_TRUE(classifier.hasKDTree());
+    EXPECT_TRUE(classifier.has_kd_tree());
 
     Point query(5.0, 5.0);
     int prediction = classifier.predict(query, 5);
@@ -27,8 +27,8 @@ TEST_F(KNNOptimizedTest, KDTreePrediction) {
     EXPECT_TRUE(prediction == 0 || prediction == 1);
 }
 
-TEST_F(KNNOptimizedTest, WeightedPrediction) {
-    KNNOptimized classifier(trainData, true);
+TEST_F(KnnOptimizedTest, WeightedPrediction) {
+    KnnOptimized classifier(trainData, true);
     classifier.setWeightStrategy(WeightStrategy::INVERSE_DISTANCE);
 
     Point query(5.0, 5.0);
@@ -37,15 +37,15 @@ TEST_F(KNNOptimizedTest, WeightedPrediction) {
     EXPECT_TRUE(prediction == 0 || prediction == 1);
 }
 
-TEST_F(KNNOptimizedTest, ParallelBatchPrediction) {
-    KNNOptimized classifier(trainData, true);
+TEST_F(KnnOptimizedTest, ParallelBatchPrediction) {
+    KnnOptimized classifier(trainData, true);
 
     auto predictions = classifier.predictBatchParallel(testData, 5, 4);
 
     EXPECT_EQ(predictions.size(), testData.size());
 }
 
-TEST_F(KNNOptimizedTest, cross_validation) {
+TEST_F(KnnOptimizedTest, cross_validation) {
     auto accuracies = cross_validation::kFoldCV(data, 5, 5, 42);
 
     EXPECT_EQ(accuracies.size(), 5);
@@ -56,7 +56,7 @@ TEST_F(KNNOptimizedTest, cross_validation) {
     }
 }
 
-TEST_F(KNNOptimizedTest, FindOptimalK) {
+TEST_F(KnnOptimizedTest, FindOptimalK) {
     auto [bestK, bestAcc] = cross_validation::findOptimalK(data, 10, 3);
 
     EXPECT_GE(bestK, 1);

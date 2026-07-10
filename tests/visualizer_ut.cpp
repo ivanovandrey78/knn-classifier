@@ -14,7 +14,7 @@ protected:
     }
 
     std::vector<Point> data;
-    KNN classifier;
+    Knn classifier;
 };
 
 // Test color generation for labels
@@ -136,7 +136,7 @@ TEST_F(VisualizerTest, EmptyClassifier) {
     std::ostringstream oss;
     std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
 
-    KNN emptyClassifier;
+    Knn emptyClassifier;
     VisualizerConfig config;
     config.gridSize = 10;
 

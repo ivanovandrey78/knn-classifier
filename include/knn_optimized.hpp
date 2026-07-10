@@ -14,34 +14,34 @@ enum class WeightStrategy {
     GAUSSIAN
 };
 
-class KNNOptimized : public KNN {
+class KnnOptimized : public Knn {
 private:
-    KDTree kdTree;
-    bool useKDTree;
+    KdTree kd_tree;
+    bool use_kd_tree;
     WeightStrategy weightStrategy;
     double gaussianSigma;
 
     int predictWeighted(const Point& query, int k) const;
 
 public:
-    KNNOptimized()
-        : useKDTree(false)
+    KnnOptimized()
+        : use_kd_tree(false)
         , weightStrategy(WeightStrategy::UNIFORM)
         , gaussianSigma(1.0) {}
 
-    explicit KNNOptimized(
+    explicit KnnOptimized(
         const std::vector<Point>& data, bool buildTree = true)
-        : KNN(data)
-        , useKDTree(buildTree)
+        : Knn(data)
+        , use_kd_tree(buildTree)
         , weightStrategy(WeightStrategy::UNIFORM)
         , gaussianSigma(1.0) {
-        if (buildTree) buildKDTree();
+        if (buildTree) buildKdTree();
     }
 
-    void buildKDTree() {
+    void buildKdTree() {
         if (trainingData.empty()) return;
-        kdTree.build(trainingData);
-        useKDTree = true;
+        kd_tree.build(trainingData);
+        use_kd_tree = true;
     }
 
     void setWeightStrategy(
@@ -62,8 +62,8 @@ public:
     std::vector<Point> rangeQuery(
         double minX, double maxX, double minY, double maxY) const;
 
-    bool hasKDTree() const {
-        return useKDTree && !kdTree.empty();
+    bool has_kd_tree() const {
+        return use_kd_tree && !kd_tree.empty();
     }
 };
 

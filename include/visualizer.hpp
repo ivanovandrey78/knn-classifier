@@ -45,7 +45,7 @@ const std::string BRIGHT_CYAN = "\033[96m";
  */
 struct VisualizerConfig {
     int gridSize = 40;         // Grid resolution
-    int k = 5;                 // K for KNN predictions
+    int k = 5;                 // K for Knn predictions
     bool useColors = true;     // Use ANSI colors
     bool showLegend = true;    // Show legend
     bool showAxes = true;      // Show axis labels
@@ -55,7 +55,7 @@ struct VisualizerConfig {
 };
 
 /**
- * @brief ASCII console visualization for KNN classifier
+ * @brief ASCII console visualization for Knn classifier
  */
 namespace visualizer {
 
@@ -76,34 +76,34 @@ char getCharForLabel(int label);
 
 /**
  * @brief Draw a map of the classification space (decision boundary)
- * @param classifier Trained KNN classifier
+ * @param classifier Trained Knn classifier
  * @param config Visualization configuration
  */
-void drawMap(const KNN& classifier, const VisualizerConfig& config = VisualizerConfig());
+void drawMap(const Knn& classifier, const VisualizerConfig& config = VisualizerConfig());
 
 /**
  * @brief Draw map with training data points overlaid
- * @param classifier Trained KNN classifier
+ * @param classifier Trained Knn classifier
  * @param config Visualization configuration
  */
-void drawMapWithData(const KNN& classifier, const VisualizerConfig& config = VisualizerConfig());
+void drawMapWithData(const Knn& classifier, const VisualizerConfig& config = VisualizerConfig());
 
 /**
  * @brief Draw map with a highlighted query point
- * @param classifier Trained KNN classifier
+ * @param classifier Trained Knn classifier
  * @param query Query point to highlight
  * @param config Visualization configuration
  */
-void drawMapWithQuery(const KNN& classifier, const Point& query,
+void drawMapWithQuery(const Knn& classifier, const Point& query,
                       const VisualizerConfig& config = VisualizerConfig());
 
 /**
  * @brief Draw map with query point and its k-nearest neighbors
- * @param classifier Trained KNN classifier
+ * @param classifier Trained Knn classifier
  * @param query Query point
  * @param config Visualization configuration
  */
-void drawMapWithNeighbors(const KNN& classifier, const Point& query,
+void drawMapWithNeighbors(const Knn& classifier, const Point& query,
                           const VisualizerConfig& config = VisualizerConfig());
 
 /**

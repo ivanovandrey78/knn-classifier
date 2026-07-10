@@ -4,7 +4,7 @@
 #include <knn.hpp>
 #include <point.hpp>
 
-class KNNTest : public ::testing::Test {
+class KnnTest : public ::testing::Test {
 protected:
     void SetUp() override {
         // Create simple training data
@@ -15,11 +15,11 @@ protected:
     }
 
     std::vector<Point> trainingData;
-    KNN classifier;
+    Knn classifier;
 };
 
 // Test basic prediction
-TEST_F(KNNTest, BasicPrediction) {
+TEST_F(KnnTest, BasicPrediction) {
     // Query point close to class 0
     Point query1(0.5, 0.5, -1);
     int pred1 = classifier.predict(query1, 3);
@@ -32,14 +32,14 @@ TEST_F(KNNTest, BasicPrediction) {
 }
 
 // Test with k=1
-TEST_F(KNNTest, KEqualsOne) {
+TEST_F(KnnTest, KEqualsOne) {
     Point query(0.1, 0.1, -1);
     int pred = classifier.predict(query, 1);
     EXPECT_EQ(pred, 0);  // Nearest is (0,0) with label 0
 }
 
 // Test with k equal to dataset size
-TEST_F(KNNTest, KEqualsDatasetSize) {
+TEST_F(KnnTest, KEqualsDatasetSize) {
     Point query(5.0, 5.0, -1);
     int pred = classifier.predict(query, trainingData.size());
     // Should still work, might be either class depending on voting
@@ -47,15 +47,15 @@ TEST_F(KNNTest, KEqualsDatasetSize) {
 }
 
 // Test exception on empty training data
-TEST_F(KNNTest, EmptyTrainingData) {
-    KNN emptyClassifier;
+TEST_F(KnnTest, EmptyTrainingData) {
+    Knn emptyClassifier;
     Point query(1.0, 1.0);
 
     EXPECT_THROW(emptyClassifier.predict(query, 3), std::runtime_error);
 }
 
 // Test exception on invalid k
-TEST_F(KNNTest, InvalidK) {
+TEST_F(KnnTest, InvalidK) {
     Point query(1.0, 1.0);
 
     EXPECT_THROW(classifier.predict(query, 0), std::invalid_argument);
@@ -64,7 +64,7 @@ TEST_F(KNNTest, InvalidK) {
 }
 
 // Test getKNearest
-TEST_F(KNNTest, GetKNearest) {
+TEST_F(KnnTest, GetKNearest) {
     Point query(0.0, 0.0);
     auto neighbors = classifier.getKNearest(query, 3);
 
@@ -81,7 +81,7 @@ TEST_F(KNNTest, GetKNearest) {
 }
 
 // Test predictWithConfidence
-TEST_F(KNNTest, PredictWithConfidence) {
+TEST_F(KnnTest, PredictWithConfidence) {
     Point query(0.5, 0.5);
     auto [label, confidence] = classifier.predictWithConfidence(query, 3);
 
@@ -91,7 +91,7 @@ TEST_F(KNNTest, PredictWithConfidence) {
 }
 
 // Test batch prediction
-TEST_F(KNNTest, BatchPrediction) {
+TEST_F(KnnTest, BatchPrediction) {
     std::vector<Point> queries = {Point(0.5, 0.5), Point(10.5, 10.5), Point(1.5, 1.5)};
 
     auto predictions = classifier.predictBatch(queries, 3);
@@ -103,12 +103,12 @@ TEST_F(KNNTest, BatchPrediction) {
 }
 
 // Test accuracy on synthetic dataset
-TEST_F(KNNTest, AccuracyOnSyntheticDataset) {
+TEST_F(KnnTest, AccuracyOnSyntheticDataset) {
     // Generate well-separated dataset
     auto fullDataset = dataset::generateSimpleDataset(100, 42);
     auto [train, test] = dataset::trainTestSplit(fullDataset, 0.7, true, 42);
 
-    KNN knn(train);
+    Knn knn(train);
 
     // Predict on test set
     std::vector<int> predictions;
@@ -126,10 +126,10 @@ TEST_F(KNNTest, AccuracyOnSyntheticDataset) {
 }
 
 // Test tie-breaking (chooses smaller label)
-TEST_F(KNNTest, TieBreaking) {
+TEST_F(KnnTest, TieBreaking) {
     std::vector<Point> tieData = {Point(0.0, 0.0, 0), Point(0.0, 1.0, 1)};
 
-    KNN tieClassifier(tieData);
+    Knn tieClassifier(tieData);
 
     // Query equidistant from both points
     Point query(0.0, 0.5);
@@ -140,16 +140,16 @@ TEST_F(KNNTest, TieBreaking) {
 }
 
 // Test isReady and size methods
-TEST_F(KNNTest, HelperMethods) {
+TEST_F(KnnTest, HelperMethods) {
     EXPECT_TRUE(classifier.isReady());
     EXPECT_EQ(classifier.size(), 6);
 
-    KNN emptyClassifier;
+    Knn emptyClassifier;
     EXPECT_FALSE(emptyClassifier.isReady());
     EXPECT_EQ(emptyClassifier.size(), 0);
 }
 
-TEST_F(KNNTest, DifferentKValues) {
+TEST_F(KnnTest, DifferentKValues) {
     Point query(5.0, 5.0);
 
     for (int k = 1; k <= static_cast<int>(trainingData.size()); ++k) {
@@ -158,7 +158,7 @@ TEST_F(KNNTest, DifferentKValues) {
 }
 
 // Test confidence is always in valid range
-TEST_F(KNNTest, ConfidenceRange) {
+TEST_F(KnnTest, ConfidenceRange) {
     std::vector<Point> queries = {Point(0.0, 0.0), Point(5.0, 5.0), Point(10.0, 10.0)};
 
     for (const auto& query : queries) {

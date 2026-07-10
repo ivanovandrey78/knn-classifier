@@ -5,7 +5,7 @@
 #include <map>
 #include <numeric>
 
-int KNNOptimized::predictWeighted(const Point& query, int k) const {
+int KnnOptimized::predictWeighted(const Point& query, int k) const {
     auto neighbors = getKNearest(query, k);
     if (neighbors.empty()) return 0;
 
@@ -51,12 +51,12 @@ int KNNOptimized::predictWeighted(const Point& query, int k) const {
     return bestLabel;
 }
 
-int KNNOptimized::predict(const Point& query, int k) const {
+int KnnOptimized::predict(const Point& query, int k) const {
     if (weightStrategy != WeightStrategy::UNIFORM)
         return predictWeighted(query, k);
 
-    if (useKDTree && hasKDTree()) {
-        auto neighbors = kdTree.kNearestNeighbors(query, k);
+    if (use_kd_tree && has_kd_tree()) {
+        auto neighbors = kd_tree.kNearestNeighbors(query, k);
 
         std::map<int, int> votes;
         for (const auto& [dist, point] : neighbors) {
@@ -77,13 +77,13 @@ int KNNOptimized::predict(const Point& query, int k) const {
         return bestLabel;
     }
 
-    return KNN::predict(query, k);
+    return Knn::predict(query, k);
 }
 
-std::vector<Neighbor> KNNOptimized::getKNearest(
+std::vector<Neighbor> KnnOptimized::getKNearest(
     const Point& query, int k) const {
-    if (useKDTree && hasKDTree()) {
-        auto kdNeighbors = kdTree.kNearestNeighbors(query, k);
+    if (use_kd_tree && has_kd_tree()) {
+        auto kdNeighbors = kd_tree.kNearestNeighbors(query, k);
         std::vector<Neighbor> result;
         result.reserve(kdNeighbors.size());
 
@@ -94,10 +94,10 @@ std::vector<Neighbor> KNNOptimized::getKNearest(
         return result;
     }
 
-    return KNN::getKNearest(query, k);
+    return Knn::getKNearest(query, k);
 }
 
-std::vector<int> KNNOptimized::predictBatchParallel(
+std::vector<int> KnnOptimized::predictBatchParallel(
     const std::vector<Point>& queries, int k,
     int numThreads) const {
     if (queries.empty()) return {};
@@ -140,10 +140,10 @@ std::vector<int> KNNOptimized::predictBatchParallel(
     return results;
 }
 
-std::vector<Point> KNNOptimized::rangeQuery(
+std::vector<Point> KnnOptimized::rangeQuery(
     double minX, double maxX, double minY, double maxY) const {
-    if (useKDTree && hasKDTree())
-        return kdTree.rangeQuery(minX, maxX, minY, maxY);
+    if (use_kd_tree && has_kd_tree())
+        return kd_tree.rangeQuery(minX, maxX, minY, maxY);
 
     std::vector<Point> results;
     for (const auto& point : trainingData) {
@@ -184,7 +184,7 @@ std::vector<double> kFoldCV(
             }
         }
 
-        KNNOptimized classifier(train, true);
+        KnnOptimized classifier(train, true);
 
         std::vector<int> predictions;
         std::vector<int> groundTruth;

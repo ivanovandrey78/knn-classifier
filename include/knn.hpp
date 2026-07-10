@@ -22,13 +22,13 @@ struct Neighbor {
 /**
  * @brief K-Nearest Neighbors classifier
  */
-class KNN {
+class Knn {
 protected:
     std::vector<Point> trainingData;
 
 public:
-    KNN() = default;
-    explicit KNN(const std::vector<Point>& data) : trainingData(data) {}
+    Knn() = default;
+    explicit Knn(const std::vector<Point>& data) : trainingData(data) {}
 
     /**
      * @brief Set training data

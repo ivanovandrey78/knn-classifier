@@ -2,7 +2,7 @@
 #include <kdtree.hpp>
 #include <dataset.hpp>
 
-class KDTreeTest : public ::testing::Test {
+class KdTreeTest : public ::testing::Test {
 protected:
     void SetUp() override {
         data = dataset::generateSimpleDataset(50, 42);
@@ -10,15 +10,15 @@ protected:
     }
 
     std::vector<Point> data;
-    KDTree tree;
+    KdTree tree;
 };
 
-TEST_F(KDTreeTest, BuildTree) {
+TEST_F(KdTreeTest, BuildTree) {
     EXPECT_EQ(tree.size(), 100);
     EXPECT_FALSE(tree.empty());
 }
 
-TEST_F(KDTreeTest, KNearestNeighbors) {
+TEST_F(KdTreeTest, KNearestNeighbors) {
     Point query(10.0, 10.0);
     auto neighbors = tree.kNearestNeighbors(query, 5);
 
@@ -30,7 +30,7 @@ TEST_F(KDTreeTest, KNearestNeighbors) {
     }
 }
 
-TEST_F(KDTreeTest, RangeQuery) {
+TEST_F(KdTreeTest, RangeQuery) {
     auto results = tree.rangeQuery(4.0, 6.0, 4.0, 6.0);
 
     // All results should be in range
@@ -42,8 +42,8 @@ TEST_F(KDTreeTest, RangeQuery) {
     }
 }
 
-TEST_F(KDTreeTest, EmptyTree) {
-    KDTree emptyTree;
+TEST_F(KdTreeTest, EmptyTree) {
+    KdTree emptyTree;
     EXPECT_TRUE(emptyTree.empty());
     EXPECT_EQ(emptyTree.size(), 0);
 

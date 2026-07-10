@@ -3,7 +3,7 @@
 #include <queue>
 #include <cmath>
 
-std::unique_ptr<KDNode> KDTree::buildTree(
+std::unique_ptr<KdNode> KdTree::buildTree(
     std::vector<Point>& points, int depth, size_t start, size_t end) {
     if (start >= end) return nullptr;
 
@@ -16,14 +16,14 @@ std::unique_ptr<KDNode> KDTree::buildTree(
                          return axis == 0 ? a.x < b.x : a.y < b.y;
                      });
 
-    auto node = std::make_unique<KDNode>(points[mid], axis);
+    auto node = std::make_unique<KdNode>(points[mid], axis);
     node->left = buildTree(points, depth + 1, start, mid);
     node->right = buildTree(points, depth + 1, mid + 1, end);
 
     return node;
 }
 
-void KDTree::build(std::vector<Point> points) {
+void KdTree::build(std::vector<Point> points) {
     treeSize = points.size();
     if (treeSize == 0) {
         root = nullptr;
@@ -32,8 +32,8 @@ void KDTree::build(std::vector<Point> points) {
     root = buildTree(points, 0, 0, points.size());
 }
 
-void KDTree::searchKNearest(
-    const KDNode* node, const Point& target, int k,
+void KdTree::searchKNearest(
+    const KdNode* node, const Point& target, int k,
     std::vector<std::pair<double, Point>>& nearest) const {
     if (!node) return;
 
@@ -54,8 +54,8 @@ void KDTree::searchKNearest(
     double diff = node->axis == 0
         ? target.x - node->point.x
         : target.y - node->point.y;
-    KDNode* nearSide = diff < 0 ? node->left.get() : node->right.get();
-    KDNode* farSide = diff < 0 ? node->right.get() : node->left.get();
+    KdNode* nearSide = diff < 0 ? node->left.get() : node->right.get();
+    KdNode* farSide = diff < 0 ? node->right.get() : node->left.get();
 
     searchKNearest(nearSide, target, k, nearest);
 
@@ -65,7 +65,7 @@ void KDTree::searchKNearest(
     }
 }
 
-std::vector<std::pair<double, Point>> KDTree::kNearestNeighbors(
+std::vector<std::pair<double, Point>> KdTree::kNearestNeighbors(
     const Point& target, int k) const {
     if (!root || k <= 0) return {};
 
@@ -82,8 +82,8 @@ std::vector<std::pair<double, Point>> KDTree::kNearestNeighbors(
     return nearest;
 }
 
-void KDTree::rangeSearch(
-    const KDNode* node, double minX, double maxX,
+void KdTree::rangeSearch(
+    const KdNode* node, double minX, double maxX,
     double minY, double maxY,
     std::vector<Point>& results) const {
     if (!node) return;
@@ -106,7 +106,7 @@ void KDTree::rangeSearch(
     }
 }
 
-std::vector<Point> KDTree::rangeQuery(
+std::vector<Point> KdTree::rangeQuery(
     double minX, double maxX, double minY, double maxY) const {
     std::vector<Point> results;
     if (root)

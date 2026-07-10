@@ -66,7 +66,7 @@ void demoDatasetGeneration() {
 }
 
 void demoKNNClassifier() {
-    std::cout << "=== KNN Classifier Demo ===" << std::endl;
+    std::cout << "=== Knn Classifier Demo ===" << std::endl;
     std::cout << std::endl;
 
     std::cout << "Generating training dataset..." << std::endl;
@@ -82,8 +82,8 @@ void demoKNNClassifier() {
               << std::endl;
     std::cout << std::endl;
 
-    std::cout << "Training KNN classifier..." << std::endl;
-    KNN classifier(trainData);
+    std::cout << "Training Knn classifier..." << std::endl;
+    Knn classifier(trainData);
     std::cout << "  Classifier ready with " << classifier.size()
               << " training points" << std::endl;
     std::cout << std::endl;
@@ -145,7 +145,7 @@ void benchmarkKNN() {
         auto [train, test]
             = dataset::trainTestSplit(dataset, 0.8, true, 42);
 
-        KNN classifier(train);
+        Knn classifier(train);
 
         auto start = std::chrono::high_resolution_clock::now();
         for (const auto& point : test)
@@ -227,7 +227,7 @@ void demoVisualization() {
     std::cout << "Generating dataset for visualization..."
               << std::endl;
     auto dataset = dataset::generateSimpleDataset(50, 42);
-    KNN classifier(dataset);
+    Knn classifier(dataset);
 
     VisualizerConfig config;
     config.gridSize = 40;
@@ -279,7 +279,7 @@ void demoMultiClassVisualization() {
         ClusterConfig(12.0, 12.0, 0.8, 3, 40)};
 
     auto dataset = dataset::generateClusters(configs, 42);
-    KNN classifier(dataset);
+    Knn classifier(dataset);
 
     VisualizerConfig config;
     config.gridSize = 50;
@@ -302,13 +302,13 @@ void demoOptimizations() {
     auto [train, test]
         = dataset::trainTestSplit(dataset, 0.8, true, 42);
 
-    std::cout << "Comparing Standard KNN vs Optimized KNN..."
+    std::cout << "Comparing Standard Knn vs Optimized Knn..."
               << std::endl;
     std::cout << std::endl;
 
-    std::cout << "1. Standard KNN (linear search)..."
+    std::cout << "1. Standard Knn (linear search)..."
               << std::endl;
-    KNN standardKNN(train);
+    Knn standardKNN(train);
     auto start = std::chrono::high_resolution_clock::now();
     auto predictions1 = standardKNN.predictBatch(test, 5);
     auto end = std::chrono::high_resolution_clock::now();
@@ -317,8 +317,8 @@ void demoOptimizations() {
             std::chrono::milliseconds>(end - start).count();
     std::cout << "   Time: " << duration1 << " ms" << std::endl;
 
-    std::cout << "\n2. Optimized KNN (KD-tree)..." << std::endl;
-    KNNOptimized optimizedKNN(train, true);
+    std::cout << "\n2. Optimized Knn (KD-tree)..." << std::endl;
+    KnnOptimized optimizedKNN(train, true);
     start = std::chrono::high_resolution_clock::now();
     auto predictions2 = optimizedKNN.predictBatch(test, 5);
     end = std::chrono::high_resolution_clock::now();
@@ -415,7 +415,7 @@ void interactiveVisualization() {
     std::cout << std::endl;
 
     auto dataset = dataset::generateSimpleDataset(80, 123);
-    KNN classifier(dataset);
+    Knn classifier(dataset);
 
     VisualizerConfig config;
     config.gridSize = 40;
@@ -461,7 +461,7 @@ void interactiveVisualization() {
 int main() {
     std::cout << "╔══════════════════════════════════════════╗"
               << std::endl;
-    std::cout << "║  KNN Classifier + Console Visualization  ║"
+    std::cout << "║  Knn Classifier + Console Visualization  ║"
               << std::endl;
     std::cout << "║  v2.0                                    ║"
               << std::endl;
@@ -525,7 +525,7 @@ int main() {
             {
                 auto dataset
                     = dataset::generateSimpleDataset(50, 42);
-                KNNOptimized classifier(dataset, true);
+                KnnOptimized classifier(dataset, true);
                 VisualizerConfig config;
                 config.gridSize = 35;
                 config.k = 5;

@@ -72,7 +72,7 @@ static double gridToY(
         - (row / static_cast<double>(gridSize - 1)) * rangeY;
 }
 
-void drawMap(const KNN& classifier, const VisualizerConfig& config) {
+void drawMap(const Knn& classifier, const VisualizerConfig& config) {
     if (!classifier.isReady()) {
         std::cout << "Classifier has no training data!\n";
         return;
@@ -134,7 +134,7 @@ void drawMap(const KNN& classifier, const VisualizerConfig& config) {
 }
 
 void drawMapWithData(
-    const KNN& classifier, const VisualizerConfig& config) {
+    const Knn& classifier, const VisualizerConfig& config) {
     if (!classifier.isReady()) {
         std::cout << "Classifier has no training data!\n";
         return;
@@ -213,7 +213,7 @@ void drawMapWithData(
     }
 }
 
-void drawMapWithQuery(const KNN& classifier, const Point& query,
+void drawMapWithQuery(const Knn& classifier, const Point& query,
                       const VisualizerConfig& config) {
     if (!classifier.isReady()) {
         std::cout << "Classifier has no training data!\n";
@@ -306,7 +306,7 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
                   << std::endl;
 }
 
-void drawMapWithNeighbors(const KNN& classifier, const Point& query,
+void drawMapWithNeighbors(const Knn& classifier, const Point& query,
                           const VisualizerConfig& config) {
     if (!classifier.isReady()) {
         std::cout << "Classifier has no training data!\n";

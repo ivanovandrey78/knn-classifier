@@ -37,7 +37,7 @@ BenchmarkResult measure(const std::string& name, Func func, size_t iterations = 
                        size_t dataSize = 0);
 
 /**
- * @brief Compare standard KNN vs optimized KNN
+ * @brief Compare standard Knn vs optimized Knn
  */
 void compareKNNImplementations(const std::vector<Point>& trainData,
                                const std::vector<Point>& testData, int k);
@@ -45,7 +45,7 @@ void compareKNNImplementations(const std::vector<Point>& trainData,
 /**
  * @brief Benchmark KD-tree vs linear search
  */
-void benchmarkKDTree(const std::vector<Point>& data, int k, size_t numQueries);
+void benchmarkKdTree(const std::vector<Point>& data, int k, size_t numQueries);
 
 /**
  * @brief Benchmark parallel vs sequential batch prediction

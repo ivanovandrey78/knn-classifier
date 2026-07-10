@@ -4,7 +4,7 @@
 #include <map>
 #include <stdexcept>
 
-int KNN::predict(const Point& query, int k) const {
+int Knn::predict(const Point& query, int k) const {
     if (trainingData.empty())
         throw std::runtime_error(
             "Training data is empty. Call setTrainingData() first.");
@@ -49,7 +49,7 @@ int KNN::predict(const Point& query, int k) const {
     return predicted_label;
 }
 
-std::vector<Neighbor> KNN::getKNearest(
+std::vector<Neighbor> Knn::getKNearest(
     const Point& query, int k) const {
     if (trainingData.empty())
         throw std::runtime_error("Training data is empty");
@@ -72,7 +72,7 @@ std::vector<Neighbor> KNN::getKNearest(
     return neighbors;
 }
 
-std::pair<int, double> KNN::predictWithConfidence(
+std::pair<int, double> Knn::predictWithConfidence(
     const Point& query, int k) const {
     auto neighbors = getKNearest(query, k);
 
@@ -96,7 +96,7 @@ std::pair<int, double> KNN::predictWithConfidence(
     return {predicted_label, confidence};
 }
 
-std::vector<int> KNN::predictBatch(
+std::vector<int> Knn::predictBatch(
     const std::vector<Point>& queries, int k) const {
     std::vector<int> predictions;
     predictions.reserve(queries.size());
