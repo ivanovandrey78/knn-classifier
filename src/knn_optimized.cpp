@@ -107,35 +107,32 @@ std::vector<int> KnnOptimized::predictBatchParallel(
         if (numThreads == 0) numThreads = 4;
     }
 
-    numThreads = std::min(
-        numThreads, static_cast<int>(queries.size()));
+    size_t nThreads = std::min<size_t>(numThreads, queries.size());
 
     std::vector<int> results(queries.size());
 
-    if (numThreads == 1) return predictBatch(queries, k);
+    if (nThreads == 1) return predictBatch(queries, k);
 
     auto worker = [this, &queries, k, &results](
         size_t start, size_t end) {
-        for (size_t i = start; i < end; ++i) {
+        for (size_t i = start; i < end; ++i)
             results[i] = predict(queries[i], k);
-        }
     };
 
     std::vector<std::thread> threads;
-    size_t chunkSize = queries.size() / numThreads;
-    size_t remainder = queries.size() % numThreads;
+    size_t chunkSize = queries.size() / nThreads;
+    size_t remainder = queries.size() % nThreads;
 
     size_t start = 0;
-    for (int i = 0; i < numThreads; ++i) {
+    for (size_t i = 0; i < nThreads; ++i) {
         size_t end = start + chunkSize
-            + (i < static_cast<int>(remainder) ? 1 : 0);
+            + (i < remainder ? 1 : 0);
         threads.emplace_back(worker, start, end);
         start = end;
     }
 
-    for (auto& thread : threads) {
+    for (auto& thread : threads)
         thread.join();
-    }
 
     return results;
 }
