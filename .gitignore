@@ -2,13 +2,12 @@
 build/
 cmake-build-*/
 out/
-.cache/
 
 # Compiled binaries
 *.exe
 *.out
 *.app
-knn_classifier
+knn-classifier
 
 # CMake
 CMakeCache.txt
