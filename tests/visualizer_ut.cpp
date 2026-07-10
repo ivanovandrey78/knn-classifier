@@ -8,204 +8,154 @@
 class VisualizerTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        // Create simple dataset
-        data = dataset::generateSimpleDataset(20, 42);
-        classifier.setTrainingData(data);
+        data_ = dataset::generateSimpleDataset(20, 42);
+        classifier_.setTrainingData(data_);
     }
 
-    std::vector<Point> data;
-    Knn classifier;
+    std::vector<Point> data_;
+    Knn classifier_;
 };
 
-// Test color generation for labels
 TEST_F(VisualizerTest, GetColorForLabel) {
-    // Should not crash and should return non-empty strings
     for (int i = 0; i < 10; ++i) {
-        std::string color = visualizer::getColorForLabel(i, false);
-        EXPECT_FALSE(color.empty());
-
-        std::string bgColor = visualizer::getColorForLabel(i, true);
-        EXPECT_FALSE(bgColor.empty());
+        EXPECT_FALSE(
+            visualizer::getColorForLabel(i, false).empty());
+        EXPECT_FALSE(
+            visualizer::getColorForLabel(i, true).empty());
     }
 }
 
-// Test character generation for labels
 TEST_F(VisualizerTest, GetCharForLabel) {
-    // Should return different characters for different labels
     std::set<char> chars;
-    for (int i = 0; i < 10; ++i) {
-        char c = visualizer::getCharForLabel(i);
-        chars.insert(c);
-    }
-
-    // Should have multiple unique characters
+    for (int i = 0; i < 10; ++i)
+        chars.insert(visualizer::getCharForLabel(i));
     EXPECT_GT(chars.size(), 1);
 }
 
-// Test progress bar
 TEST_F(VisualizerTest, ProgressBar) {
-    std::string bar0 = visualizer::progressBar(0.0, 20);
-    EXPECT_FALSE(bar0.empty());
-    EXPECT_NE(bar0.find("0.0%"), std::string::npos);
-
-    std::string bar50 = visualizer::progressBar(0.5, 20);
-    EXPECT_FALSE(bar50.empty());
-    EXPECT_NE(bar50.find("50.0%"), std::string::npos);
-
-    std::string bar100 = visualizer::progressBar(1.0, 20);
-    EXPECT_FALSE(bar100.empty());
-    EXPECT_NE(bar100.find("100.0%"), std::string::npos);
+    EXPECT_NE(visualizer::progressBar(0.0, 20)
+                  .find("0.0%"),
+              std::string::npos);
+    EXPECT_NE(visualizer::progressBar(0.5, 20)
+                  .find("50.0%"),
+              std::string::npos);
+    EXPECT_NE(visualizer::progressBar(1.0, 20)
+                  .find("100.0%"),
+              std::string::npos);
 }
 
-// Test drawMap doesn't crash
-TEST_F(VisualizerTest, DrawMapNoCrash) {
-    // Redirect stdout to prevent console output in tests
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
+namespace {
 
-    VisualizerConfig config;
-    config.gridSize = 10;  // Small for testing
-    config.useColors = false;  // No colors in test
+void redirectCout(
+    std::ostringstream& oss, std::streambuf*& old) {
+    old = std::cout.rdbuf(oss.rdbuf());
+}
 
-    EXPECT_NO_THROW(visualizer::drawMap(classifier, config));
-
+void restoreCout(std::streambuf* old) {
     std::cout.rdbuf(old);
 }
 
-// Test drawMapWithData doesn't crash
-TEST_F(VisualizerTest, DrawMapWithDataNoCrash) {
+struct CoutGuard {
     std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
+    std::streambuf* old;
 
+    CoutGuard() { old = std::cout.rdbuf(oss.rdbuf()); }
+    ~CoutGuard() { std::cout.rdbuf(old); }
+};
+
+}  // namespace
+
+TEST_F(VisualizerTest, DrawMapNoCrash) {
+    CoutGuard g;
     VisualizerConfig config;
     config.gridSize = 10;
     config.useColors = false;
-
-    EXPECT_NO_THROW(visualizer::drawMapWithData(classifier, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(visualizer::drawMap(classifier_, config));
 }
 
-// Test drawMapWithQuery doesn't crash
-TEST_F(VisualizerTest, DrawMapWithQueryNoCrash) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
+TEST_F(VisualizerTest, DrawMapWithDataNoCrash) {
+    CoutGuard g;
+    VisualizerConfig config;
+    config.gridSize = 10;
+    config.useColors = false;
+    EXPECT_NO_THROW(
+        visualizer::drawMapWithData(classifier_, config));
+}
 
+TEST_F(VisualizerTest, DrawMapWithQueryNoCrash) {
+    CoutGuard g;
     Point query(10.0, 10.0);
     VisualizerConfig config;
     config.gridSize = 10;
     config.useColors = false;
-
-    EXPECT_NO_THROW(visualizer::drawMapWithQuery(classifier, query, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(visualizer::drawMapWithQuery(
+        classifier_, query, config));
 }
 
-// Test drawMapWithNeighbors doesn't crash
 TEST_F(VisualizerTest, DrawMapWithNeighborsNoCrash) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
+    CoutGuard g;
     Point query(10.0, 10.0);
     VisualizerConfig config;
     config.gridSize = 10;
     config.k = 5;
     config.useColors = false;
-
-    EXPECT_NO_THROW(visualizer::drawMapWithNeighbors(classifier, query, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(visualizer::drawMapWithNeighbors(
+        classifier_, query, config));
 }
 
-// Test drawDataPoints doesn't crash
 TEST_F(VisualizerTest, DrawDataPointsNoCrash) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
+    CoutGuard g;
     VisualizerConfig config;
     config.gridSize = 10;
     config.useColors = false;
-
-    EXPECT_NO_THROW(visualizer::drawDataPoints(data, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(
+        visualizer::drawDataPoints(data_, config));
 }
 
-// Test with empty classifier
 TEST_F(VisualizerTest, EmptyClassifier) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
-    Knn emptyClassifier;
+    CoutGuard g;
+    Knn empty;
     VisualizerConfig config;
     config.gridSize = 10;
-
-    // Should handle empty classifier gracefully
-    EXPECT_NO_THROW(visualizer::drawMap(emptyClassifier, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(visualizer::drawMap(empty, config));
 }
 
-// Test with empty data
 TEST_F(VisualizerTest, EmptyData) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
-    std::vector<Point> emptyData;
+    CoutGuard g;
+    std::vector<Point> empty;
     VisualizerConfig config;
     config.gridSize = 10;
-
-    // Should handle empty data gracefully
-    EXPECT_NO_THROW(visualizer::drawDataPoints(emptyData, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(
+        visualizer::drawDataPoints(empty, config));
 }
 
-// Test separator drawing
 TEST_F(VisualizerTest, DrawSeparator) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
+    CoutGuard g;
     EXPECT_NO_THROW(visualizer::drawSeparator(50, false));
     EXPECT_NO_THROW(visualizer::drawSeparator(50, true));
-
-    std::cout.rdbuf(old);
 }
 
-// Test legend drawing
 TEST_F(VisualizerTest, DrawLegend) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
+    CoutGuard g;
     EXPECT_NO_THROW(visualizer::drawLegend(2, true));
     EXPECT_NO_THROW(visualizer::drawLegend(5, false));
-
-    std::cout.rdbuf(old);
 }
 
-// Test with different grid sizes
 TEST_F(VisualizerTest, DifferentGridSizes) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
+    CoutGuard g;
+    std::vector<int> sizes = {5, 10, 20, 40};
 
-    std::vector<int> gridSizes = {5, 10, 20, 40};
-
-    for (int size : gridSizes) {
+    for (int size : sizes) {
         VisualizerConfig config;
         config.gridSize = size;
         config.useColors = false;
-
-        EXPECT_NO_THROW(visualizer::drawMap(classifier, config));
+        EXPECT_NO_THROW(
+            visualizer::drawMap(classifier_, config));
     }
-
-    std::cout.rdbuf(old);
 }
 
-// Test configuration options
 TEST_F(VisualizerTest, ConfigurationOptions) {
-    std::ostringstream oss;
-    std::streambuf* old = std::cout.rdbuf(oss.rdbuf());
-
+    CoutGuard g;
     VisualizerConfig config;
     config.gridSize = 15;
     config.k = 3;
@@ -215,8 +165,6 @@ TEST_F(VisualizerTest, ConfigurationOptions) {
     config.showGrid = false;
     config.emptyChar = '.';
     config.padding = 0.2;
-
-    EXPECT_NO_THROW(visualizer::drawMap(classifier, config));
-
-    std::cout.rdbuf(old);
+    EXPECT_NO_THROW(
+        visualizer::drawMap(classifier_, config));
 }
