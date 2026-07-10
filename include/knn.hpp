@@ -12,13 +12,7 @@ struct Neighbor {
     int label;
     Point point;
 
-    Neighbor(double d, int l, const Point& p) 
-        : distance(d), label(l), point(p) 
-    {}
-
-    Neighbor() 
-        : distance(0.0), label(0), point() 
-    {}
+    Neighbor(double d, int l, const Point& p) : distance(d), label(l), point(p) {}
 
     bool operator<(const Neighbor& other) const { return distance < other.distance; }
 };
@@ -48,7 +42,7 @@ public:
      * @throws std::runtime_error if training data is empty
      * @throws std::invalid_argument if k is invalid
      */
-    int predict(const Point& query, int k) const;
+    virtual int predict(const Point& query, int k) const;
 
     /**
      * @brief Get k nearest neighbors for a query point
@@ -56,7 +50,7 @@ public:
      * @param k Number of neighbors to find
      * @return Vector of k nearest neighbors
      */
-    std::vector<Neighbor> getKNearest(const Point& query, int k) const;
+    virtual std::vector<Neighbor> getKNearest(const Point& query, int k) const;
 
     /**
      * @brief Predict with confidence score
@@ -94,4 +88,3 @@ public:
 };
 
 #endif  // KNN_HPP
-    
