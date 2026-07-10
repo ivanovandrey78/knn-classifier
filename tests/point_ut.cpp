@@ -146,9 +146,3 @@ TEST_F(PointTest, DistanceIgnoresLabel) {
     EXPECT_DOUBLE_EQ(distance1, distance2);
     EXPECT_DOUBLE_EQ(distance1, 5.0);
 }
-
-// Main function for running tests
-int main(int argc, char** argv) {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
-}
