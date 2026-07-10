@@ -149,11 +149,9 @@ TEST_F(KNNTest, HelperMethods) {
     EXPECT_EQ(emptyClassifier.size(), 0);
 }
 
-// Test with different k values
 TEST_F(KNNTest, DifferentKValues) {
     Point query(5.0, 5.0);
 
-    // Try different k values
     for (int k = 1; k <= static_cast<int>(trainingData.size()); ++k) {
         EXPECT_NO_THROW(classifier.predict(query, k));
     }

@@ -77,10 +77,10 @@ bool saveResultsToCSV(const std::vector<BenchmarkResult>& results,
 
 }  // namespace Benchmark
 
-// Template implementation
 template <typename Func>
-BenchmarkResult Benchmark::measure(const std::string& name, Func func, size_t iterations,
-                                  size_t dataSize) {
+BenchmarkResult Benchmark::measure(
+    const std::string& name, Func func,
+    size_t iterations, size_t dataSize) {
     std::vector<double> times;
     times.reserve(iterations);
 
@@ -89,11 +89,12 @@ BenchmarkResult Benchmark::measure(const std::string& name, Func func, size_t it
         func();
         auto end = std::chrono::high_resolution_clock::now();
 
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-        times.push_back(duration.count() / 1000.0);  // Convert to ms
+        auto duration
+            = std::chrono::duration_cast<
+                std::chrono::microseconds>(end - start);
+        times.push_back(duration.count() / 1000.0);
     }
 
-    // Calculate statistics
     double sum = 0.0;
     double minTime = times[0];
     double maxTime = times[0];
@@ -106,14 +107,14 @@ BenchmarkResult Benchmark::measure(const std::string& name, Func func, size_t it
 
     double mean = sum / times.size();
 
-    // Calculate standard deviation
     double variance = 0.0;
-    for (double time : times) {
+    for (double time : times)
         variance += (time - mean) * (time - mean);
-    }
     double stdDev = std::sqrt(variance / times.size());
 
-    return BenchmarkResult{name, mean, minTime, maxTime, stdDev, iterations, dataSize};
+    return BenchmarkResult{
+        name, mean, minTime, maxTime,
+        stdDev, iterations, dataSize};
 }
 
 #endif  // BENCHMARK_HPP

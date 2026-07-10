@@ -6,10 +6,6 @@
  * @brief Test suite for Point class
  */
 class PointTest : public ::testing::Test {
-protected:
-    void SetUp() override {
-        // Setup code if needed
-    }
 };
 
 // Test default constructor

@@ -34,7 +34,7 @@ TEST_F(VisualizerTest, GetCharForLabel) {
     // Should return different characters for different labels
     std::set<char> chars;
     for (int i = 0; i < 10; ++i) {
-        const char* c = Visualizer::getCharForLabel(i);
+        char c = Visualizer::getCharForLabel(i);
         chars.insert(c);
     }
 

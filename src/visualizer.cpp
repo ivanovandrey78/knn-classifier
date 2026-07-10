@@ -38,152 +38,149 @@ std::string getColorForLabel(int label, bool useBackground) {
 }
 
 char getCharForLabel(int label) {
-    const char chars[] = {'O', '#', '^', '*', '+', 'X', 'V', '<', '>', '@'};
+    const char chars[] = {'O', '#', '^', '*', '+',
+                          'X', 'V', '<', '>', '@'};
     return chars[label % 10];
+}
+
+static void applyPadding(
+    double& minX, double& maxX, double& minY, double& maxY,
+    double padding) {
+    double rangeX = maxX - minX;
+    double rangeY = maxY - minY;
+    double padX = rangeX * padding;
+    double padY = rangeY * padding;
+    minX -= padX;
+    maxX += padX;
+    minY -= padY;
+    maxY += padY;
+}
+
+static double normalizeRange(double range) {
+    return range == 0.0 ? 1.0 : range;
+}
+
+static double gridToX(
+    int col, int gridSize, double minX, double rangeX) {
+    return minX
+        + (col / static_cast<double>(gridSize - 1)) * rangeX;
+}
+
+static double gridToY(
+    int row, int gridSize, double maxY, double rangeY) {
+    return maxY
+        - (row / static_cast<double>(gridSize - 1)) * rangeY;
 }
 
 void drawMap(const KNN& classifier, const VisualizerConfig& config) {
     if (!classifier.isReady()) {
-        std::cout << "Classifier has no training data!" << std::endl;
+        std::cout << "Classifier has no training data!\n";
         return;
     }
 
     const auto& training = classifier.getTrainingData();
     auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
 
-    // Add padding
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double padX = rangeX * config.padding;
-    double padY = rangeY * config.padding;
-    minX -= padX;
-    maxX += padX;
-    minY -= padY;
-    maxY += padY;
-
-    rangeX = maxX - minX;
-    rangeY = maxY - minY;
-
-    if (rangeX == 0.0) rangeX = 1.0;
-    if (rangeY == 0.0) rangeY = 1.0;
+    applyPadding(minX, maxX, minY, maxY, config.padding);
+    double rangeX = normalizeRange(maxX - minX);
+    double rangeY = normalizeRange(maxY - minY);
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD << "Decision Boundary Visualization" << AnsiColors::RESET
-              << std::endl;
+    std::cout << AnsiColors::BOLD
+              << "Decision Boundary Visualization"
+              << AnsiColors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
-    // Draw grid from top to bottom (Y decreases)
     for (int row = 0; row < config.gridSize; ++row) {
-        if (config.showAxes && row == config.gridSize / 2) {
+        if (config.showAxes && row == config.gridSize / 2)
             std::cout << "Y ";
-        } else {
+        else
             std::cout << "  ";
-        }
 
         for (int col = 0; col < config.gridSize; ++col) {
-            // Map grid position to data coordinates
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
 
             Point query(x, y);
             int predictedLabel = classifier.predict(query, config.k);
 
-            if (config.useColors) {
-                std::cout << getColorForLabel(predictedLabel, true) << " "
-                          << AnsiColors::RESET;
-            } else {
+            if (config.useColors)
+                std::cout << getColorForLabel(predictedLabel, true)
+                          << " " << AnsiColors::RESET;
+            else
                 std::cout << getCharForLabel(predictedLabel);
-            }
         }
         std::cout << std::endl;
     }
 
     if (config.showAxes) {
         std::cout << "  ";
-        for (int i = 0; i < config.gridSize; ++i) {
-            if (i == config.gridSize / 2) {
-                std::cout << "X";
-            } else {
-                std::cout << " ";
-            }
-        }
+        for (int i = 0; i < config.gridSize; ++i)
+            std::cout << (i == config.gridSize / 2 ? "X" : " ");
         std::cout << std::endl;
     }
 
-    std::cout << "\nBounds: X[" << std::fixed << std::setprecision(2) << minX << ", " << maxX
-              << "], Y[" << minY << ", " << maxY << "]" << std::endl;
+    std::cout << "\nBounds: X[" << std::fixed << std::setprecision(2)
+              << minX << ", " << maxX << "], Y[" << minY << ", "
+              << maxY << "]" << std::endl;
 
     if (config.showLegend) {
-        // Count unique labels
         std::set<int> uniqueLabels;
-        for (const auto& p : training) {
-            uniqueLabels.insert(p.label);
-        }
+        for (const auto& p : training) uniqueLabels.insert(p.label);
         drawLegend(uniqueLabels.size(), config.useColors);
     }
 }
 
-void drawMapWithData(const KNN& classifier, const VisualizerConfig& config) {
+void drawMapWithData(
+    const KNN& classifier, const VisualizerConfig& config) {
     if (!classifier.isReady()) {
-        std::cout << "Classifier has no training data!" << std::endl;
+        std::cout << "Classifier has no training data!\n";
         return;
     }
 
     const auto& training = classifier.getTrainingData();
     auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
 
-    // Add padding
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double padX = rangeX * config.padding;
-    double padY = rangeY * config.padding;
-    minX -= padX;
-    maxX += padX;
-    minY -= padY;
-    maxY += padY;
+    applyPadding(minX, maxX, minY, maxY, config.padding);
+    double rangeX = normalizeRange(maxX - minX);
+    double rangeY = normalizeRange(maxY - minY);
 
-    rangeX = maxX - minX;
-    rangeY = maxY - minY;
-
-    if (rangeX == 0.0) rangeX = 1.0;
-    if (rangeY == 0.0) rangeY = 1.0;
-
-    // Create grid with decision boundaries
-    std::vector<std::vector<int>> grid(config.gridSize, std::vector<int>(config.gridSize, -1));
+    std::vector<std::vector<int>> grid(
+        config.gridSize, std::vector<int>(config.gridSize, -1));
 
     for (int row = 0; row < config.gridSize; ++row) {
         for (int col = 0; col < config.gridSize; ++col) {
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
-            Point query(x, y);
-            grid[row][col] = classifier.predict(query, config.k);
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
+            grid[row][col] = classifier.predict(Point(x, y), config.k);
         }
     }
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD << "Decision Boundary + Training Data" << AnsiColors::RESET
-              << std::endl;
+    std::cout << AnsiColors::BOLD
+              << "Decision Boundary + Training Data"
+              << AnsiColors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
-    // Draw with training points overlaid
+    double threshold
+        = std::min(rangeX, rangeY) / config.gridSize * 0.5;
+
     for (int row = 0; row < config.gridSize; ++row) {
         std::cout << "  ";
 
         for (int col = 0; col < config.gridSize; ++col) {
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
 
-            // Check if any training point is close to this grid cell
             bool hasPoint = false;
             int pointLabel = -1;
-            double threshold = std::min(rangeX, rangeY) / config.gridSize * 0.5;
-
             for (const auto& point : training) {
-                if (std::abs(point.x - x) < threshold && std::abs(point.y - y) < threshold) {
+                if (std::abs(point.x - x) < threshold
+                    && std::abs(point.y - y) < threshold) {
                     hasPoint = true;
                     pointLabel = point.label;
                     break;
@@ -191,21 +188,19 @@ void drawMapWithData(const KNN& classifier, const VisualizerConfig& config) {
             }
 
             if (hasPoint) {
-                // Draw training point
-                if (config.useColors) {
-                    std::cout << AnsiColors::BOLD << getColorForLabel(pointLabel)
-                              << getCharForLabel(pointLabel) << AnsiColors::RESET;
-                } else {
-                    std::cout << getCharForLabel(pointLabel);
-                }
-            } else {
-                // Draw background (decision boundary)
-                if (config.useColors) {
-                    std::cout << getColorForLabel(grid[row][col], true) << " "
+                if (config.useColors)
+                    std::cout << AnsiColors::BOLD
+                              << getColorForLabel(pointLabel)
+                              << getCharForLabel(pointLabel)
                               << AnsiColors::RESET;
-                } else {
+                else
+                    std::cout << getCharForLabel(pointLabel);
+            } else {
+                if (config.useColors)
+                    std::cout << getColorForLabel(grid[row][col], true)
+                              << " " << AnsiColors::RESET;
+                else
                     std::cout << config.emptyChar;
-                }
             }
         }
         std::cout << std::endl;
@@ -213,9 +208,7 @@ void drawMapWithData(const KNN& classifier, const VisualizerConfig& config) {
 
     if (config.showLegend) {
         std::set<int> uniqueLabels;
-        for (const auto& p : training) {
-            uniqueLabels.insert(p.label);
-        }
+        for (const auto& p : training) uniqueLabels.insert(p.label);
         drawLegend(uniqueLabels.size(), config.useColors);
     }
 }
@@ -223,72 +216,64 @@ void drawMapWithData(const KNN& classifier, const VisualizerConfig& config) {
 void drawMapWithQuery(const KNN& classifier, const Point& query,
                       const VisualizerConfig& config) {
     if (!classifier.isReady()) {
-        std::cout << "Classifier has no training data!" << std::endl;
+        std::cout << "Classifier has no training data!\n";
         return;
     }
 
     const auto& training = classifier.getTrainingData();
     auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
 
-    // Include query point in bounds
     minX = std::min(minX, query.x);
     maxX = std::max(maxX, query.x);
     minY = std::min(minY, query.y);
     maxY = std::max(maxY, query.y);
 
-    // Add padding
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double padX = rangeX * config.padding;
-    double padY = rangeY * config.padding;
-    minX -= padX;
-    maxX += padX;
-    minY -= padY;
-    maxY += padY;
-
-    rangeX = maxX - minX;
-    rangeY = maxY - minY;
-
-    if (rangeX == 0.0) rangeX = 1.0;
-    if (rangeY == 0.0) rangeY = 1.0;
+    applyPadding(minX, maxX, minY, maxY, config.padding);
+    double rangeX = normalizeRange(maxX - minX);
+    double rangeY = normalizeRange(maxY - minY);
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD << "Query Point Prediction" << AnsiColors::RESET << std::endl;
+    std::cout << AnsiColors::BOLD
+              << "Query Point Prediction"
+              << AnsiColors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
 
-    auto [predictedLabel, confidence] = classifier.predictWithConfidence(query, config.k);
+    auto [predictedLabel, confidence]
+        = classifier.predictWithConfidence(query, config.k);
     std::cout << "\nQuery: " << query << std::endl;
-    std::cout << "Predicted Class: " << predictedLabel << " (confidence: " << std::fixed
-              << std::setprecision(1) << (confidence * 100) << "%)" << std::endl;
+    std::cout << "Predicted Class: " << predictedLabel
+              << " (confidence: " << std::fixed
+              << std::setprecision(1) << (confidence * 100)
+              << "%)" << std::endl;
     std::cout << "\n";
 
-    // Draw grid
+    double threshold
+        = std::min(rangeX, rangeY) / config.gridSize * 0.5;
+
     for (int row = 0; row < config.gridSize; ++row) {
         std::cout << "  ";
 
         for (int col = 0; col < config.gridSize; ++col) {
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
 
-            double threshold = std::min(rangeX, rangeY) / config.gridSize * 0.5;
-
-            // Check for query point
-            if (std::abs(query.x - x) < threshold && std::abs(query.y - y) < threshold) {
-                if (config.useColors) {
-                    std::cout << AnsiColors::BOLD << AnsiColors::BRIGHT_GREEN << "Q"
+            if (std::abs(query.x - x) < threshold
+                && std::abs(query.y - y) < threshold) {
+                if (config.useColors)
+                    std::cout << AnsiColors::BOLD
+                              << AnsiColors::BRIGHT_GREEN << "Q"
                               << AnsiColors::RESET;
-                } else {
+                else
                     std::cout << "Q";
-                }
                 continue;
             }
 
-            // Check for training points
             bool hasPoint = false;
             int pointLabel = -1;
             for (const auto& point : training) {
-                if (std::abs(point.x - x) < threshold && std::abs(point.y - y) < threshold) {
+                if (std::abs(point.x - x) < threshold
+                    && std::abs(point.y - y) < threshold) {
                     hasPoint = true;
                     pointLabel = point.label;
                     break;
@@ -296,36 +281,35 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
             }
 
             if (hasPoint) {
-                if (config.useColors) {
-                    std::cout << getColorForLabel(pointLabel) << getCharForLabel(pointLabel)
+                if (config.useColors)
+                    std::cout << getColorForLabel(pointLabel)
+                              << getCharForLabel(pointLabel)
                               << AnsiColors::RESET;
-                } else {
+                else
                     std::cout << getCharForLabel(pointLabel);
-                }
             } else {
-                // Background
                 Point gridPoint(x, y);
                 int bgLabel = classifier.predict(gridPoint, config.k);
-                if (config.useColors) {
-                    std::cout << getColorForLabel(bgLabel, true) << " " << AnsiColors::RESET;
-                } else {
+                if (config.useColors)
+                    std::cout << getColorForLabel(bgLabel, true)
+                              << " " << AnsiColors::RESET;
+                else
                     std::cout << config.emptyChar;
-                }
             }
         }
         std::cout << std::endl;
     }
 
-    if (config.useColors) {
-        std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q" << AnsiColors::RESET
-                  << " = Query Point" << std::endl;
-    }
+    if (config.useColors)
+        std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q"
+                  << AnsiColors::RESET << " = Query Point"
+                  << std::endl;
 }
 
 void drawMapWithNeighbors(const KNN& classifier, const Point& query,
                           const VisualizerConfig& config) {
     if (!classifier.isReady()) {
-        std::cout << "Classifier has no training data!" << std::endl;
+        std::cout << "Classifier has no training data!\n";
         return;
     }
 
@@ -334,172 +318,151 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
 
     auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
 
-    // Include query point
     minX = std::min(minX, query.x);
     maxX = std::max(maxX, query.x);
     minY = std::min(minY, query.y);
     maxY = std::max(maxY, query.y);
 
-    // Add padding
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double padX = rangeX * config.padding;
-    double padY = rangeY * config.padding;
-    minX -= padX;
-    maxX += padX;
-    minY -= padY;
-    maxY += padY;
-
-    rangeX = maxX - minX;
-    rangeY = maxY - minY;
-
-    if (rangeX == 0.0) rangeX = 1.0;
-    if (rangeY == 0.0) rangeY = 1.0;
+    applyPadding(minX, maxX, minY, maxY, config.padding);
+    double rangeX = normalizeRange(maxX - minX);
+    double rangeY = normalizeRange(maxY - minY);
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD << "K-Nearest Neighbors Visualization (k=" << config.k << ")"
-              << AnsiColors::RESET << std::endl;
+    std::cout << AnsiColors::BOLD
+              << "K-Nearest Neighbors Visualization (k="
+              << config.k << ")" << AnsiColors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
 
-    auto [predictedLabel, confidence] = classifier.predictWithConfidence(query, config.k);
+    auto [predictedLabel, confidence]
+        = classifier.predictWithConfidence(query, config.k);
     std::cout << "\nQuery: " << query << std::endl;
-    std::cout << "Predicted Class: " << predictedLabel << " (confidence: " << std::fixed
-              << std::setprecision(1) << (confidence * 100) << "%)" << std::endl;
+    std::cout << "Predicted Class: " << predictedLabel
+              << " (confidence: " << std::fixed
+              << std::setprecision(1) << (confidence * 100)
+              << "%)" << std::endl;
     std::cout << "\n";
 
-    // Create set of neighbor points for quick lookup
     std::set<std::pair<double, double>> neighborSet;
-    for (const auto& neighbor : neighbors) {
+    for (const auto& neighbor : neighbors)
         neighborSet.insert({neighbor.point.x, neighbor.point.y});
-    }
 
-    // Draw grid
+    double threshold
+        = std::min(rangeX, rangeY) / config.gridSize * 0.5;
+
     for (int row = 0; row < config.gridSize; ++row) {
         std::cout << "  ";
 
         for (int col = 0; col < config.gridSize; ++col) {
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
 
-            double threshold = std::min(rangeX, rangeY) / config.gridSize * 0.5;
-
-            // Check for query point
-            if (std::abs(query.x - x) < threshold && std::abs(query.y - y) < threshold) {
-                if (config.useColors) {
-                    std::cout << AnsiColors::BOLD << AnsiColors::BRIGHT_GREEN << "Q"
+            if (std::abs(query.x - x) < threshold
+                && std::abs(query.y - y) < threshold) {
+                if (config.useColors)
+                    std::cout << AnsiColors::BOLD
+                              << AnsiColors::BRIGHT_GREEN << "Q"
                               << AnsiColors::RESET;
-                } else {
+                else
                     std::cout << "Q";
-                }
                 continue;
             }
 
-            // Check for neighbor or other training points
             bool isNeighbor = false;
             bool hasPoint = false;
             int pointLabel = -1;
 
             for (const auto& point : training) {
-                if (std::abs(point.x - x) < threshold && std::abs(point.y - y) < threshold) {
+                if (std::abs(point.x - x) < threshold
+                    && std::abs(point.y - y) < threshold) {
                     hasPoint = true;
                     pointLabel = point.label;
-                    if (neighborSet.count({point.x, point.y})) {
+                    if (neighborSet.count({point.x, point.y}))
                         isNeighbor = true;
-                    }
                     break;
                 }
             }
 
             if (hasPoint) {
                 if (isNeighbor) {
-                    // Highlight neighbors
-                    if (config.useColors) {
-                        std::cout << AnsiColors::BOLD << AnsiColors::BRIGHT_YELLOW
-                                  << getCharForLabel(pointLabel) << AnsiColors::RESET;
-                    } else {
-                        std::cout << "*";
-                    }
-                } else {
-                    // Regular training point
-                    if (config.useColors) {
-                        std::cout << AnsiColors::GRAY << getCharForLabel(pointLabel)
+                    if (config.useColors)
+                        std::cout << AnsiColors::BOLD
+                                  << AnsiColors::BRIGHT_YELLOW
+                                  << getCharForLabel(pointLabel)
                                   << AnsiColors::RESET;
-                    } else {
+                    else
+                        std::cout << "*";
+                } else {
+                    if (config.useColors)
+                        std::cout << AnsiColors::GRAY
+                                  << getCharForLabel(pointLabel)
+                                  << AnsiColors::RESET;
+                    else
                         std::cout << getCharForLabel(pointLabel);
-                    }
                 }
             } else {
-                // Background
                 Point gridPoint(x, y);
                 int bgLabel = classifier.predict(gridPoint, config.k);
-                if (config.useColors) {
-                    std::cout << getColorForLabel(bgLabel, true) << " " << AnsiColors::RESET;
-                } else {
+                if (config.useColors)
+                    std::cout << getColorForLabel(bgLabel, true)
+                              << " " << AnsiColors::RESET;
+                else
                     std::cout << config.emptyChar;
-                }
             }
         }
         std::cout << std::endl;
     }
 
-    std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q" << AnsiColors::RESET
-              << " = Query Point, " << AnsiColors::BRIGHT_YELLOW << "★" << AnsiColors::RESET
-              << " = K-Nearest Neighbors" << std::endl;
+    std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q"
+              << AnsiColors::RESET << " = Query Point, "
+              << AnsiColors::BRIGHT_YELLOW << "★"
+              << AnsiColors::RESET << " = K-Nearest Neighbors"
+              << std::endl;
 
     std::cout << "\nNearest Neighbors:" << std::endl;
     for (size_t i = 0; i < neighbors.size(); ++i) {
-        std::cout << "  " << (i + 1) << ". " << neighbors[i].point << " - distance: "
-                  << std::setprecision(3) << neighbors[i].distance << std::endl;
+        std::cout << "  " << (i + 1) << ". " << neighbors[i].point
+                  << " - distance: " << std::setprecision(3)
+                  << neighbors[i].distance << std::endl;
     }
 }
 
-void drawDataPoints(const std::vector<Point>& training, const VisualizerConfig& config) {
+void drawDataPoints(const std::vector<Point>& training,
+                    const VisualizerConfig& config) {
     if (training.empty()) {
-        std::cout << "No data points to visualize!" << std::endl;
+        std::cout << "No data points to visualize!\n";
         return;
     }
 
     auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
 
-    // Add padding
-    double rangeX = maxX - minX;
-    double rangeY = maxY - minY;
-    double padX = rangeX * config.padding;
-    double padY = rangeY * config.padding;
-    minX -= padX;
-    maxX += padX;
-    minY -= padY;
-    maxY += padY;
-
-    rangeX = maxX - minX;
-    rangeY = maxY - minY;
-
-    if (rangeX == 0.0) rangeX = 1.0;
-    if (rangeY == 0.0) rangeY = 1.0;
+    applyPadding(minX, maxX, minY, maxY, config.padding);
+    double rangeX = normalizeRange(maxX - minX);
+    double rangeY = normalizeRange(maxY - minY);
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD << "Training Data Scatter Plot" << AnsiColors::RESET
-              << std::endl;
+    std::cout << AnsiColors::BOLD
+              << "Training Data Scatter Plot"
+              << AnsiColors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
-    // Draw grid
+    double threshold
+        = std::min(rangeX, rangeY) / config.gridSize * 0.5;
+
     for (int row = 0; row < config.gridSize; ++row) {
         std::cout << "  ";
 
         for (int col = 0; col < config.gridSize; ++col) {
-            double x = minX + (col / static_cast<double>(config.gridSize - 1)) * rangeX;
-            double y = maxY - (row / static_cast<double>(config.gridSize - 1)) * rangeY;
+            double x = gridToX(col, config.gridSize, minX, rangeX);
+            double y = gridToY(row, config.gridSize, maxY, rangeY);
 
-            double threshold = std::min(rangeX, rangeY) / config.gridSize * 0.5;
-
-            // Check for training points
             bool hasPoint = false;
             int pointLabel = -1;
             for (const auto& point : training) {
-                if (std::abs(point.x - x) < threshold && std::abs(point.y - y) < threshold) {
+                if (std::abs(point.x - x) < threshold
+                    && std::abs(point.y - y) < threshold) {
                     hasPoint = true;
                     pointLabel = point.label;
                     break;
@@ -507,12 +470,13 @@ void drawDataPoints(const std::vector<Point>& training, const VisualizerConfig& 
             }
 
             if (hasPoint) {
-                if (config.useColors) {
-                    std::cout << AnsiColors::BOLD << getColorForLabel(pointLabel)
-                              << getCharForLabel(pointLabel) << AnsiColors::RESET;
-                } else {
+                if (config.useColors)
+                    std::cout << AnsiColors::BOLD
+                              << getColorForLabel(pointLabel)
+                              << getCharForLabel(pointLabel)
+                              << AnsiColors::RESET;
+                else
                     std::cout << getCharForLabel(pointLabel);
-                }
             } else {
                 std::cout << config.emptyChar;
             }
@@ -521,14 +485,13 @@ void drawDataPoints(const std::vector<Point>& training, const VisualizerConfig& 
     }
 
     std::cout << "\nTotal points: " << training.size() << std::endl;
-    std::cout << "Bounds: X[" << std::fixed << std::setprecision(2) << minX << ", " << maxX
-              << "], Y[" << minY << ", " << maxY << "]" << std::endl;
+    std::cout << "Bounds: X[" << std::fixed << std::setprecision(2)
+              << minX << ", " << maxX << "], Y[" << minY << ", "
+              << maxY << "]" << std::endl;
 
     if (config.showLegend) {
         std::set<int> uniqueLabels;
-        for (const auto& p : training) {
-            uniqueLabels.insert(p.label);
-        }
+        for (const auto& p : training) uniqueLabels.insert(p.label);
         drawLegend(uniqueLabels.size(), config.useColors);
     }
 }
@@ -537,25 +500,22 @@ void drawLegend(int numClasses, bool useColors) {
     std::cout << "\nLegend:" << std::endl;
     for (int i = 0; i < numClasses; ++i) {
         std::cout << "  Class " << i << ": ";
-        if (useColors) {
-            std::cout << getColorForLabel(i) << getCharForLabel(i) << AnsiColors::RESET;
-        } else {
+        if (useColors)
+            std::cout << getColorForLabel(i) << getCharForLabel(i)
+                      << AnsiColors::RESET;
+        else
             std::cout << getCharForLabel(i);
-        }
         std::cout << std::endl;
     }
 }
 
 void drawSeparator(int width, bool thick) {
-    char ch = thick ? '=' : '-';
-    for (int i = 0; i < width; ++i) {
-        std::cout << ch;
-    }
+    for (int i = 0; i < width; ++i)
+        std::cout << (thick ? '=' : '-');
     std::cout << std::endl;
 }
 
 void clearScreen() {
-    // ANSI escape code to clear screen
     std::cout << "\033[2J\033[1;1H";
 }
 
@@ -564,14 +524,10 @@ std::string progressBar(double progress, int width) {
     std::ostringstream oss;
 
     oss << "[";
-    for (int i = 0; i < width; ++i) {
-        if (i < filledWidth) {
-            oss << "█";
-        } else {
-            oss << "░";
-        }
-    }
-    oss << "] " << std::fixed << std::setprecision(1) << (progress * 100) << "%";
+    for (int i = 0; i < width; ++i)
+        oss << (i < filledWidth ? "█" : "░");
+    oss << "] " << std::fixed << std::setprecision(1)
+        << (progress * 100) << "%";
 
     return oss.str();
 }

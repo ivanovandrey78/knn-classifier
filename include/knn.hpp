@@ -12,6 +12,8 @@ struct Neighbor {
     int label;
     Point point;
 
+    Neighbor() : distance(0.0), label(0), point() {}
+
     Neighbor(double d, int l, const Point& p) : distance(d), label(l), point(p) {}
 
     bool operator<(const Neighbor& other) const { return distance < other.distance; }
@@ -21,7 +23,7 @@ struct Neighbor {
  * @brief K-Nearest Neighbors classifier
  */
 class KNN {
-private:
+protected:
     std::vector<Point> trainingData;
 
 public:
@@ -32,7 +34,7 @@ public:
      * @brief Set training data
      * @param data Vector of training points
      */
-    void setTrainingData(const std::vector<Point>& data);
+    void setTrainingData(const std::vector<Point>& data) { trainingData = data; }
 
     /**
      * @brief Predict class label for a query point
