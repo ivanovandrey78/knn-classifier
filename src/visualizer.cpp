@@ -9,30 +9,30 @@
 #include <set>
 #include <sstream>
 
-namespace Visualizer {
+namespace visualizer {
 
 std::string getColorForLabel(int label, bool useBackground) {
     if (useBackground) {
         switch (label % 6) {
-            case 0: return AnsiColors::BG_BLUE;
-            case 1: return AnsiColors::BG_RED;
-            case 2: return AnsiColors::BG_GREEN;
-            case 3: return AnsiColors::BG_YELLOW;
-            case 4: return AnsiColors::BG_MAGENTA;
-            case 5: return AnsiColors::BG_CYAN;
-            default: return AnsiColors::RESET;
+            case 0: return ansi_colors::BG_BLUE;
+            case 1: return ansi_colors::BG_RED;
+            case 2: return ansi_colors::BG_GREEN;
+            case 3: return ansi_colors::BG_YELLOW;
+            case 4: return ansi_colors::BG_MAGENTA;
+            case 5: return ansi_colors::BG_CYAN;
+            default: return ansi_colors::RESET;
         }
     } else {
         switch (label % 8) {
-            case 0: return AnsiColors::BRIGHT_BLUE;
-            case 1: return AnsiColors::BRIGHT_RED;
-            case 2: return AnsiColors::BRIGHT_GREEN;
-            case 3: return AnsiColors::BRIGHT_YELLOW;
-            case 4: return AnsiColors::BRIGHT_MAGENTA;
-            case 5: return AnsiColors::BRIGHT_CYAN;
-            case 6: return AnsiColors::CYAN;
-            case 7: return AnsiColors::MAGENTA;
-            default: return AnsiColors::WHITE;
+            case 0: return ansi_colors::BRIGHT_BLUE;
+            case 1: return ansi_colors::BRIGHT_RED;
+            case 2: return ansi_colors::BRIGHT_GREEN;
+            case 3: return ansi_colors::BRIGHT_YELLOW;
+            case 4: return ansi_colors::BRIGHT_MAGENTA;
+            case 5: return ansi_colors::BRIGHT_CYAN;
+            case 6: return ansi_colors::CYAN;
+            case 7: return ansi_colors::MAGENTA;
+            default: return ansi_colors::WHITE;
         }
     }
 }
@@ -79,7 +79,7 @@ void drawMap(const KNN& classifier, const VisualizerConfig& config) {
     }
 
     const auto& training = classifier.getTrainingData();
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(training);
 
     applyPadding(minX, maxX, minY, maxY, config.padding);
     double rangeX = normalizeRange(maxX - minX);
@@ -87,9 +87,9 @@ void drawMap(const KNN& classifier, const VisualizerConfig& config) {
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD
+    std::cout << ansi_colors::BOLD
               << "Decision Boundary Visualization"
-              << AnsiColors::RESET << std::endl;
+              << ansi_colors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
@@ -108,7 +108,7 @@ void drawMap(const KNN& classifier, const VisualizerConfig& config) {
 
             if (config.useColors)
                 std::cout << getColorForLabel(predictedLabel, true)
-                          << " " << AnsiColors::RESET;
+                          << " " << ansi_colors::RESET;
             else
                 std::cout << getCharForLabel(predictedLabel);
         }
@@ -141,7 +141,7 @@ void drawMapWithData(
     }
 
     const auto& training = classifier.getTrainingData();
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(training);
 
     applyPadding(minX, maxX, minY, maxY, config.padding);
     double rangeX = normalizeRange(maxX - minX);
@@ -160,9 +160,9 @@ void drawMapWithData(
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD
+    std::cout << ansi_colors::BOLD
               << "Decision Boundary + Training Data"
-              << AnsiColors::RESET << std::endl;
+              << ansi_colors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
@@ -189,16 +189,16 @@ void drawMapWithData(
 
             if (hasPoint) {
                 if (config.useColors)
-                    std::cout << AnsiColors::BOLD
+                    std::cout << ansi_colors::BOLD
                               << getColorForLabel(pointLabel)
                               << getCharForLabel(pointLabel)
-                              << AnsiColors::RESET;
+                              << ansi_colors::RESET;
                 else
                     std::cout << getCharForLabel(pointLabel);
             } else {
                 if (config.useColors)
                     std::cout << getColorForLabel(grid[row][col], true)
-                              << " " << AnsiColors::RESET;
+                              << " " << ansi_colors::RESET;
                 else
                     std::cout << config.emptyChar;
             }
@@ -221,7 +221,7 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
     }
 
     const auto& training = classifier.getTrainingData();
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(training);
 
     minX = std::min(minX, query.x);
     maxX = std::max(maxX, query.x);
@@ -234,9 +234,9 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD
+    std::cout << ansi_colors::BOLD
               << "Query Point Prediction"
-              << AnsiColors::RESET << std::endl;
+              << ansi_colors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
 
     auto [predictedLabel, confidence]
@@ -261,9 +261,9 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
             if (std::abs(query.x - x) < threshold
                 && std::abs(query.y - y) < threshold) {
                 if (config.useColors)
-                    std::cout << AnsiColors::BOLD
-                              << AnsiColors::BRIGHT_GREEN << "Q"
-                              << AnsiColors::RESET;
+                    std::cout << ansi_colors::BOLD
+                              << ansi_colors::BRIGHT_GREEN << "Q"
+                              << ansi_colors::RESET;
                 else
                     std::cout << "Q";
                 continue;
@@ -284,7 +284,7 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
                 if (config.useColors)
                     std::cout << getColorForLabel(pointLabel)
                               << getCharForLabel(pointLabel)
-                              << AnsiColors::RESET;
+                              << ansi_colors::RESET;
                 else
                     std::cout << getCharForLabel(pointLabel);
             } else {
@@ -292,7 +292,7 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
                 int bgLabel = classifier.predict(gridPoint, config.k);
                 if (config.useColors)
                     std::cout << getColorForLabel(bgLabel, true)
-                              << " " << AnsiColors::RESET;
+                              << " " << ansi_colors::RESET;
                 else
                     std::cout << config.emptyChar;
             }
@@ -301,8 +301,8 @@ void drawMapWithQuery(const KNN& classifier, const Point& query,
     }
 
     if (config.useColors)
-        std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q"
-                  << AnsiColors::RESET << " = Query Point"
+        std::cout << "\n" << ansi_colors::BRIGHT_GREEN << "Q"
+                  << ansi_colors::RESET << " = Query Point"
                   << std::endl;
 }
 
@@ -316,7 +316,7 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
     auto neighbors = classifier.getKNearest(query, config.k);
     const auto& training = classifier.getTrainingData();
 
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(training);
 
     minX = std::min(minX, query.x);
     maxX = std::max(maxX, query.x);
@@ -329,9 +329,9 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD
+    std::cout << ansi_colors::BOLD
               << "K-Nearest Neighbors Visualization (k="
-              << config.k << ")" << AnsiColors::RESET << std::endl;
+              << config.k << ")" << ansi_colors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
 
     auto [predictedLabel, confidence]
@@ -360,9 +360,9 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
             if (std::abs(query.x - x) < threshold
                 && std::abs(query.y - y) < threshold) {
                 if (config.useColors)
-                    std::cout << AnsiColors::BOLD
-                              << AnsiColors::BRIGHT_GREEN << "Q"
-                              << AnsiColors::RESET;
+                    std::cout << ansi_colors::BOLD
+                              << ansi_colors::BRIGHT_GREEN << "Q"
+                              << ansi_colors::RESET;
                 else
                     std::cout << "Q";
                 continue;
@@ -386,17 +386,17 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
             if (hasPoint) {
                 if (isNeighbor) {
                     if (config.useColors)
-                        std::cout << AnsiColors::BOLD
-                                  << AnsiColors::BRIGHT_YELLOW
+                        std::cout << ansi_colors::BOLD
+                                  << ansi_colors::BRIGHT_YELLOW
                                   << getCharForLabel(pointLabel)
-                                  << AnsiColors::RESET;
+                                  << ansi_colors::RESET;
                     else
                         std::cout << "*";
                 } else {
                     if (config.useColors)
-                        std::cout << AnsiColors::GRAY
+                        std::cout << ansi_colors::GRAY
                                   << getCharForLabel(pointLabel)
-                                  << AnsiColors::RESET;
+                                  << ansi_colors::RESET;
                     else
                         std::cout << getCharForLabel(pointLabel);
                 }
@@ -405,7 +405,7 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
                 int bgLabel = classifier.predict(gridPoint, config.k);
                 if (config.useColors)
                     std::cout << getColorForLabel(bgLabel, true)
-                              << " " << AnsiColors::RESET;
+                              << " " << ansi_colors::RESET;
                 else
                     std::cout << config.emptyChar;
             }
@@ -413,10 +413,10 @@ void drawMapWithNeighbors(const KNN& classifier, const Point& query,
         std::cout << std::endl;
     }
 
-    std::cout << "\n" << AnsiColors::BRIGHT_GREEN << "Q"
-              << AnsiColors::RESET << " = Query Point, "
-              << AnsiColors::BRIGHT_YELLOW << "★"
-              << AnsiColors::RESET << " = K-Nearest Neighbors"
+    std::cout << "\n" << ansi_colors::BRIGHT_GREEN << "Q"
+              << ansi_colors::RESET << " = Query Point, "
+              << ansi_colors::BRIGHT_YELLOW << "★"
+              << ansi_colors::RESET << " = K-Nearest Neighbors"
               << std::endl;
 
     std::cout << "\nNearest Neighbors:" << std::endl;
@@ -434,7 +434,7 @@ void drawDataPoints(const std::vector<Point>& training,
         return;
     }
 
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(training);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(training);
 
     applyPadding(minX, maxX, minY, maxY, config.padding);
     double rangeX = normalizeRange(maxX - minX);
@@ -442,9 +442,9 @@ void drawDataPoints(const std::vector<Point>& training,
 
     std::cout << "\n";
     drawSeparator(config.gridSize + 2, true);
-    std::cout << AnsiColors::BOLD
+    std::cout << ansi_colors::BOLD
               << "Training Data Scatter Plot"
-              << AnsiColors::RESET << std::endl;
+              << ansi_colors::RESET << std::endl;
     drawSeparator(config.gridSize + 2, false);
     std::cout << "\n";
 
@@ -471,10 +471,10 @@ void drawDataPoints(const std::vector<Point>& training,
 
             if (hasPoint) {
                 if (config.useColors)
-                    std::cout << AnsiColors::BOLD
+                    std::cout << ansi_colors::BOLD
                               << getColorForLabel(pointLabel)
                               << getCharForLabel(pointLabel)
-                              << AnsiColors::RESET;
+                              << ansi_colors::RESET;
                 else
                     std::cout << getCharForLabel(pointLabel);
             } else {
@@ -502,7 +502,7 @@ void drawLegend(int numClasses, bool useColors) {
         std::cout << "  Class " << i << ": ";
         if (useColors)
             std::cout << getColorForLabel(i) << getCharForLabel(i)
-                      << AnsiColors::RESET;
+                      << ansi_colors::RESET;
         else
             std::cout << getCharForLabel(i);
         std::cout << std::endl;

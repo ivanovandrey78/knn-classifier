@@ -23,7 +23,7 @@ struct ClusterConfig {
 /**
  * @brief Dataset utilities for generation, manipulation and evaluation
  */
-namespace Dataset {
+namespace dataset {
 
 /**
  * @brief Generate synthetic dataset with multiple clusters

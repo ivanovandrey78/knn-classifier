@@ -5,8 +5,8 @@
 class KNNOptimizedTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        data = Dataset::generateSimpleDataset(50, 42);
-        auto [train, test] = Dataset::trainTestSplit(data, 0.8, true, 42);
+        data = dataset::generateSimpleDataset(50, 42);
+        auto [train, test] = dataset::trainTestSplit(data, 0.8, true, 42);
         trainData = train;
         testData = test;
     }
@@ -45,8 +45,8 @@ TEST_F(KNNOptimizedTest, ParallelBatchPrediction) {
     EXPECT_EQ(predictions.size(), testData.size());
 }
 
-TEST_F(KNNOptimizedTest, CrossValidation) {
-    auto accuracies = CrossValidation::kFoldCV(data, 5, 5, 42);
+TEST_F(KNNOptimizedTest, cross_validation) {
+    auto accuracies = cross_validation::kFoldCV(data, 5, 5, 42);
 
     EXPECT_EQ(accuracies.size(), 5);
 
@@ -57,7 +57,7 @@ TEST_F(KNNOptimizedTest, CrossValidation) {
 }
 
 TEST_F(KNNOptimizedTest, FindOptimalK) {
-    auto [bestK, bestAcc] = CrossValidation::findOptimalK(data, 10, 3);
+    auto [bestK, bestAcc] = cross_validation::findOptimalK(data, 10, 3);
 
     EXPECT_GE(bestK, 1);
     EXPECT_LE(bestK, 10);

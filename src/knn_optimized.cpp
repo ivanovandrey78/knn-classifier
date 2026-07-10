@@ -155,7 +155,7 @@ std::vector<Point> KNNOptimized::rangeQuery(
     return results;
 }
 
-namespace CrossValidation {
+namespace cross_validation {
 
 std::vector<double> kFoldCV(
     const std::vector<Point>& data, int folds, int knn,
@@ -194,7 +194,7 @@ std::vector<double> kFoldCV(
             groundTruth.push_back(point.label);
         }
 
-        double accuracy = Dataset::calculateAccuracy(
+        double accuracy = dataset::calculateAccuracy(
             predictions, groundTruth);
         accuracies.push_back(accuracy);
     }
@@ -223,4 +223,4 @@ std::pair<int, double> findOptimalK(
     return {bestK, bestAccuracy};
 }
 
-}  // namespace CrossValidation
+}  // namespace cross_validation

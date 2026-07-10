@@ -9,7 +9,7 @@
 /**
  * @brief ANSI color codes for terminal output
  */
-namespace AnsiColors {
+namespace ansi_colors {
 const std::string RESET = "\033[0m";
 const std::string BOLD = "\033[1m";
 
@@ -38,7 +38,7 @@ const std::string BRIGHT_YELLOW = "\033[93m";
 const std::string BRIGHT_BLUE = "\033[94m";
 const std::string BRIGHT_MAGENTA = "\033[95m";
 const std::string BRIGHT_CYAN = "\033[96m";
-}  // namespace AnsiColors
+}  // namespace ansi_colors
 
 /**
  * @brief Visualization options
@@ -57,7 +57,7 @@ struct VisualizerConfig {
 /**
  * @brief ASCII console visualization for KNN classifier
  */
-namespace Visualizer {
+namespace visualizer {
 
 /**
  * @brief Get color for a class label

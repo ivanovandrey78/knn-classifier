@@ -105,8 +105,8 @@ TEST_F(KNNTest, BatchPrediction) {
 // Test accuracy on synthetic dataset
 TEST_F(KNNTest, AccuracyOnSyntheticDataset) {
     // Generate well-separated dataset
-    auto fullDataset = Dataset::generateSimpleDataset(100, 42);
-    auto [train, test] = Dataset::trainTestSplit(fullDataset, 0.7, true, 42);
+    auto fullDataset = dataset::generateSimpleDataset(100, 42);
+    auto [train, test] = dataset::trainTestSplit(fullDataset, 0.7, true, 42);
 
     KNN knn(train);
 
@@ -119,7 +119,7 @@ TEST_F(KNNTest, AccuracyOnSyntheticDataset) {
         groundTruth.push_back(point.label);
     }
 
-    double accuracy = Dataset::calculateAccuracy(predictions, groundTruth);
+    double accuracy = dataset::calculateAccuracy(predictions, groundTruth);
 
     // Well-separated clusters should have high accuracy
     EXPECT_GT(accuracy, 90.0);  // At least 90% accuracy

@@ -8,7 +8,7 @@
 #include <random>
 #include <sstream>
 
-namespace Dataset {
+namespace dataset {
 
 std::vector<Point> generateClusters(const std::vector<ClusterConfig>& configs,
                                     unsigned int seed) {

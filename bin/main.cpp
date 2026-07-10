@@ -49,8 +49,8 @@ void demoDatasetGeneration() {
     std::cout << std::endl;
 
     std::cout << "Generating simple 2-class dataset..." << std::endl;
-    auto dataset = Dataset::generateSimpleDataset(150, 42);
-    std::cout << Dataset::getDatasetStats(dataset) << std::endl;
+    auto dataset = dataset::generateSimpleDataset(150, 42);
+    std::cout << dataset::getDatasetStats(dataset) << std::endl;
     std::cout << std::endl;
 
     std::cout << "Generating custom 3-class dataset..." << std::endl;
@@ -59,8 +59,8 @@ void demoDatasetGeneration() {
         ClusterConfig(15.0, 15.0, 1.5, 1, 100),
         ClusterConfig(10.0, 5.0, 1.0, 2, 80)};
     auto multiClassDataset
-        = Dataset::generateClusters(configs, 123);
-    std::cout << Dataset::getDatasetStats(multiClassDataset)
+        = dataset::generateClusters(configs, 123);
+    std::cout << dataset::getDatasetStats(multiClassDataset)
               << std::endl;
     std::cout << std::endl;
 }
@@ -70,12 +70,12 @@ void demoKNNClassifier() {
     std::cout << std::endl;
 
     std::cout << "Generating training dataset..." << std::endl;
-    auto fullDataset = Dataset::generateSimpleDataset(200, 42);
+    auto fullDataset = dataset::generateSimpleDataset(200, 42);
 
     std::cout << "Splitting into train/test sets (80/20)..."
               << std::endl;
     auto [trainData, testData]
-        = Dataset::trainTestSplit(fullDataset, 0.8, true, 42);
+        = dataset::trainTestSplit(fullDataset, 0.8, true, 42);
     std::cout << "  Training set: " << trainData.size()
               << " points" << std::endl;
     std::cout << "  Test set: " << testData.size() << " points"
@@ -98,7 +98,7 @@ void demoKNNClassifier() {
             groundTruth.push_back(point.label);
 
         double accuracy
-            = Dataset::calculateAccuracy(predictions, groundTruth);
+            = dataset::calculateAccuracy(predictions, groundTruth);
         std::cout << "  k=" << std::setw(2) << k
                   << ": Accuracy = " << std::fixed
                   << std::setprecision(2) << accuracy << "%"
@@ -141,9 +141,9 @@ void benchmarkKNN() {
     std::vector<int> datasetSizes = {100, 500, 1000, 2000};
 
     for (int size : datasetSizes) {
-        auto dataset = Dataset::generateSimpleDataset(size / 2, 42);
+        auto dataset = dataset::generateSimpleDataset(size / 2, 42);
         auto [train, test]
-            = Dataset::trainTestSplit(dataset, 0.8, true, 42);
+            = dataset::trainTestSplit(dataset, 0.8, true, 42);
 
         KNN classifier(train);
 
@@ -171,16 +171,16 @@ void demoDatasetUtilities() {
     std::cout << "=== Dataset Utilities Demo ===" << std::endl;
     std::cout << std::endl;
 
-    auto dataset = Dataset::generateSimpleDataset(100, 42);
+    auto dataset = dataset::generateSimpleDataset(100, 42);
 
     std::cout << "Testing CSV save/load..." << std::endl;
     std::string filename = "demo_dataset.csv";
 
-    if (Dataset::saveToCSV(dataset, filename)) {
+    if (dataset::saveToCSV(dataset, filename)) {
         std::cout << "  ✓ Saved dataset to " << filename
                   << std::endl;
 
-        auto loaded = Dataset::loadFromCSV(filename);
+        auto loaded = dataset::loadFromCSV(filename);
         std::cout << "  ✓ Loaded " << loaded.size()
                   << " points from " << filename << std::endl;
 
@@ -190,14 +190,14 @@ void demoDatasetUtilities() {
 
     std::cout << "Testing normalization..." << std::endl;
     auto [minXBefore, maxXBefore, minYBefore, maxYBefore]
-        = Dataset::getBounds(dataset);
+        = dataset::getBounds(dataset);
     std::cout << "  Before: X[" << minXBefore << ", " << maxXBefore
               << "], Y[" << minYBefore << ", " << maxYBefore << "]"
               << std::endl;
 
-    Dataset::normalize(dataset);
+    dataset::normalize(dataset);
     auto [minXAfter, maxXAfter, minYAfter, maxYAfter]
-        = Dataset::getBounds(dataset);
+        = dataset::getBounds(dataset);
     std::cout << "  After:  X[" << minXAfter << ", " << maxXAfter
               << "], Y[" << minYAfter << ", " << maxYAfter << "]"
               << std::endl;
@@ -209,7 +209,7 @@ void demoDatasetUtilities() {
     std::vector<int> groundTruth
         = {0, 1, 1, 0, 0, 1, 1, 1};
 
-    auto matrix = Dataset::confusionMatrix(
+    auto matrix = dataset::confusionMatrix(
         predictions, groundTruth, 2);
     std::cout << "  Confusion Matrix (2x2):" << std::endl;
     std::cout << "         Pred 0  Pred 1" << std::endl;
@@ -226,7 +226,7 @@ void demoVisualization() {
 
     std::cout << "Generating dataset for visualization..."
               << std::endl;
-    auto dataset = Dataset::generateSimpleDataset(50, 42);
+    auto dataset = dataset::generateSimpleDataset(50, 42);
     KNN classifier(dataset);
 
     VisualizerConfig config;
@@ -238,28 +238,28 @@ void demoVisualization() {
     std::cout << "\nPress Enter to see decision boundary "
                  "visualization...";
     std::cin.get();
-    Visualizer::drawMap(classifier, config);
+    visualizer::drawMap(classifier, config);
 
     std::cout << "\nPress Enter to see decision boundary "
                  "with training data...";
     std::cin.get();
-    Visualizer::drawMapWithData(classifier, config);
+    visualizer::drawMapWithData(classifier, config);
 
     std::cout << "\nPress Enter to see training data "
                  "scatter plot...";
     std::cin.get();
-    Visualizer::drawDataPoints(dataset, config);
+    visualizer::drawDataPoints(dataset, config);
 
     std::cout << "\nPress Enter to see query point "
                  "prediction...";
     std::cin.get();
     Point query1(10.0, 10.0);
-    Visualizer::drawMapWithQuery(classifier, query1, config);
+    visualizer::drawMapWithQuery(classifier, query1, config);
 
     std::cout << "\nPress Enter to see k-nearest neighbors...";
     std::cin.get();
     Point query2(7.0, 8.0);
-    Visualizer::drawMapWithNeighbors(
+    visualizer::drawMapWithNeighbors(
         classifier, query2, config);
 
     std::cout << std::endl;
@@ -278,7 +278,7 @@ void demoMultiClassVisualization() {
         ClusterConfig(3.0, 12.0, 0.8, 2, 40),
         ClusterConfig(12.0, 12.0, 0.8, 3, 40)};
 
-    auto dataset = Dataset::generateClusters(configs, 42);
+    auto dataset = dataset::generateClusters(configs, 42);
     KNN classifier(dataset);
 
     VisualizerConfig config;
@@ -289,7 +289,7 @@ void demoMultiClassVisualization() {
     std::cout << "\nPress Enter to see 4-class "
                  "decision boundaries...";
     std::cin.get();
-    Visualizer::drawMapWithData(classifier, config);
+    visualizer::drawMapWithData(classifier, config);
 
     std::cout << std::endl;
 }
@@ -298,9 +298,9 @@ void demoOptimizations() {
     std::cout << "=== Optimization Demo ===" << std::endl;
     std::cout << std::endl;
 
-    auto dataset = Dataset::generateSimpleDataset(200, 42);
+    auto dataset = dataset::generateSimpleDataset(200, 42);
     auto [train, test]
-        = Dataset::trainTestSplit(dataset, 0.8, true, 42);
+        = dataset::trainTestSplit(dataset, 0.8, true, 42);
 
     std::cout << "Comparing Standard KNN vs Optimized KNN..."
               << std::endl;
@@ -365,7 +365,7 @@ void demoOptimizations() {
             groundTruth.push_back(p.label);
 
         double acc
-            = Dataset::calculateAccuracy(preds, groundTruth);
+            = dataset::calculateAccuracy(preds, groundTruth);
         std::cout << "   " << std::setw(20) << std::left << name
                   << ": " << std::fixed << std::setprecision(1)
                   << acc << "%" << std::endl;
@@ -378,12 +378,12 @@ void demoCrossValidation() {
     std::cout << "=== Cross-Validation Demo ===" << std::endl;
     std::cout << std::endl;
 
-    auto dataset = Dataset::generateSimpleDataset(150, 42);
+    auto dataset = dataset::generateSimpleDataset(150, 42);
 
     std::cout << "Performing 5-fold cross-validation..."
               << std::endl;
     auto accuracies
-        = CrossValidation::kFoldCV(dataset, 5, 5, 42);
+        = cross_validation::kFoldCV(dataset, 5, 5, 42);
 
     std::cout << "\nFold Results:" << std::endl;
     for (size_t i = 0; i < accuracies.size(); ++i) {
@@ -401,7 +401,7 @@ void demoCrossValidation() {
 
     std::cout << "\nFinding optimal k..." << std::endl;
     auto [bestK, bestAcc]
-        = CrossValidation::findOptimalK(dataset, 15, 5);
+        = cross_validation::findOptimalK(dataset, 15, 5);
     std::cout << "Best k: " << bestK
               << " with accuracy: " << std::fixed
               << std::setprecision(2) << bestAcc << "%"
@@ -414,7 +414,7 @@ void interactiveVisualization() {
     std::cout << "=== Interactive Visualization ===" << std::endl;
     std::cout << std::endl;
 
-    auto dataset = Dataset::generateSimpleDataset(80, 123);
+    auto dataset = dataset::generateSimpleDataset(80, 123);
     KNN classifier(dataset);
 
     VisualizerConfig config;
@@ -423,7 +423,7 @@ void interactiveVisualization() {
     config.useColors = true;
 
     auto [minX, maxX, minY, maxY]
-        = Dataset::getBounds(dataset);
+        = dataset::getBounds(dataset);
 
     std::cout << "Dataset bounds: X[" << minX << ", " << maxX
               << "], Y[" << minY << ", " << maxY << "]"
@@ -445,8 +445,8 @@ void interactiveVisualization() {
 
         if (iss >> x >> y) {
             Point query(x, y);
-            Visualizer::clearScreen();
-            Visualizer::drawMapWithNeighbors(
+            visualizer::clearScreen();
+            visualizer::drawMapWithNeighbors(
                 classifier, query, config);
             std::cout << "\n";
         } else {
@@ -496,7 +496,7 @@ int main() {
             demoMultiClassVisualization();
             std::cout << "\nPress Enter to run benchmarks...";
             std::cin.get();
-            Benchmark::runFullSuite(1000, 200);
+            benchmark::runFullSuite(1000, 200);
             break;
 
         case 2:
@@ -513,7 +513,7 @@ int main() {
             break;
 
         case 5:
-            Benchmark::runFullSuite(2000, 400);
+            benchmark::runFullSuite(2000, 400);
             break;
 
         case 6:
@@ -524,12 +524,12 @@ int main() {
             testPointDistance();
             {
                 auto dataset
-                    = Dataset::generateSimpleDataset(50, 42);
+                    = dataset::generateSimpleDataset(50, 42);
                 KNNOptimized classifier(dataset, true);
                 VisualizerConfig config;
                 config.gridSize = 35;
                 config.k = 5;
-                Visualizer::drawMapWithData(
+                visualizer::drawMapWithData(
                     classifier, config);
             }
             break;

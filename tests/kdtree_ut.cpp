@@ -5,7 +5,7 @@
 class KDTreeTest : public ::testing::Test {
 protected:
     void SetUp() override {
-        data = Dataset::generateSimpleDataset(50, 42);
+        data = dataset::generateSimpleDataset(50, 42);
         tree.build(data);
     }
 

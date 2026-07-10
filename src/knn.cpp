@@ -31,26 +31,26 @@ int KNN::predict(const Point& query, int k) const {
                       });
 
     std::map<int, int> votes;
-    for (int i = 0; i < k; ++i) {
+    for (int i = 0; i < k; ++i)
         votes[distances[i].second]++;
-    }
 
-    int predictedLabel = votes.begin()->first;
-    int maxVotes = votes.begin()->second;
+    int predicted_label = votes.begin()->first;
+    int max_votes = votes.begin()->second;
 
     for (const auto& [label, count] : votes) {
-        if (count > maxVotes) {
-            maxVotes = count;
-            predictedLabel = label;
-        } else if (count == maxVotes && label < predictedLabel) {
-            predictedLabel = label;
+        if (count > max_votes) {
+            max_votes = count;
+            predicted_label = label;
+        } else if (count == max_votes && label < predicted_label) {
+            predicted_label = label;
         }
     }
 
-    return predictedLabel;
+    return predicted_label;
 }
 
-std::vector<Neighbor> KNN::getKNearest(const Point& query, int k) const {
+std::vector<Neighbor> KNN::getKNearest(
+    const Point& query, int k) const {
     if (trainingData.empty())
         throw std::runtime_error("Training data is empty");
 
@@ -77,24 +77,23 @@ std::pair<int, double> KNN::predictWithConfidence(
     auto neighbors = getKNearest(query, k);
 
     std::map<int, int> votes;
-    for (const auto& neighbor : neighbors) {
+    for (const auto& neighbor : neighbors)
         votes[neighbor.label]++;
-    }
 
-    int predictedLabel = votes.begin()->first;
-    int maxVotes = votes.begin()->second;
+    int predicted_label = votes.begin()->first;
+    int max_votes = votes.begin()->second;
 
     for (const auto& [label, count] : votes) {
-        if (count > maxVotes) {
-            maxVotes = count;
-            predictedLabel = label;
-        } else if (count == maxVotes && label < predictedLabel) {
-            predictedLabel = label;
+        if (count > max_votes) {
+            max_votes = count;
+            predicted_label = label;
+        } else if (count == max_votes && label < predicted_label) {
+            predicted_label = label;
         }
     }
 
-    double confidence = static_cast<double>(maxVotes) / k;
-    return {predictedLabel, confidence};
+    double confidence = static_cast<double>(max_votes) / k;
+    return {predicted_label, confidence};
 }
 
 std::vector<int> KNN::predictBatch(
@@ -102,9 +101,8 @@ std::vector<int> KNN::predictBatch(
     std::vector<int> predictions;
     predictions.reserve(queries.size());
 
-    for (const auto& query : queries) {
+    for (const auto& query : queries)
         predictions.push_back(predict(query, k));
-    }
 
     return predictions;
 }

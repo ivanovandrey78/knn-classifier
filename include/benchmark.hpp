@@ -24,7 +24,7 @@ struct BenchmarkResult {
 /**
  * @brief Benchmarking utilities
  */
-namespace Benchmark {
+namespace benchmark {
 
 /**
  * @brief Measure execution time of a function
@@ -78,7 +78,7 @@ bool saveResultsToCSV(const std::vector<BenchmarkResult>& results,
 }  // namespace Benchmark
 
 template <typename Func>
-BenchmarkResult Benchmark::measure(
+BenchmarkResult benchmark::measure(
     const std::string& name, Func func,
     size_t iterations, size_t dataSize) {
     std::vector<double> times;

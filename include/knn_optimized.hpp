@@ -67,7 +67,7 @@ public:
     }
 };
 
-namespace CrossValidation {
+namespace cross_validation {
 
 std::vector<double> kFoldCV(
     const std::vector<Point>& data, int folds, int knn,
@@ -77,6 +77,6 @@ std::pair<int, double> findOptimalK(
     const std::vector<Point>& data, int maxK = 20,
     int folds = 5);
 
-}  // namespace CrossValidation
+}  // namespace cross_validation
 
 #endif  // KNN_OPTIMIZED_HPP

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace Benchmark {
+namespace benchmark {
 
 void printResult(const BenchmarkResult& result) {
     std::cout << std::fixed << std::setprecision(3);
@@ -62,7 +62,7 @@ void benchmarkKDTree(
               << ", k: " << k << std::endl;
     std::cout << std::endl;
 
-    auto [minX, maxX, minY, maxY] = Dataset::getBounds(data);
+    auto [minX, maxX, minY, maxY] = dataset::getBounds(data);
     std::mt19937 gen(42);
     std::uniform_real_distribution<> distX(minX, maxX);
     std::uniform_real_distribution<> distY(minY, maxY);
@@ -170,7 +170,7 @@ void benchmarkWeightStrategies(
         std::vector<int> groundTruth;
         for (const auto& p : testData)
             groundTruth.push_back(p.label);
-        double accuracy = Dataset::calculateAccuracy(
+        double accuracy = dataset::calculateAccuracy(
             predictions, groundTruth);
         std::cout << "    → Accuracy: " << std::fixed
                   << std::setprecision(2) << accuracy << "%"
@@ -194,9 +194,9 @@ void runFullSuite(int datasetSize, int testSize) {
     for (int size : sizes) {
         if (size > datasetSize) continue;
 
-        auto data = Dataset::generateSimpleDataset(size / 2, 42);
+        auto data = dataset::generateSimpleDataset(size / 2, 42);
         auto [train, test]
-            = Dataset::trainTestSplit(data, 0.8, true, 42);
+            = dataset::trainTestSplit(data, 0.8, true, 42);
 
         KNN standard(train);
         KNNOptimized optimized(train, true);
@@ -221,10 +221,10 @@ void runFullSuite(int datasetSize, int testSize) {
                   << std::endl;
     }
 
-    auto fullData = Dataset::generateSimpleDataset(
+    auto fullData = dataset::generateSimpleDataset(
         datasetSize / 2, 42);
     auto [train, test]
-        = Dataset::trainTestSplit(fullData, 0.8, true, 42);
+        = dataset::trainTestSplit(fullData, 0.8, true, 42);
 
     compareKNNImplementations(train, test, 5);
     benchmarkKDTree(train, 5, testSize);
