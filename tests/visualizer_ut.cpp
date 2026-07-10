@@ -32,7 +32,7 @@ TEST_F(VisualizerTest, GetColorForLabel) {
 // Test character generation for labels
 TEST_F(VisualizerTest, GetCharForLabel) {
     // Should return different characters for different labels
-    std::set<const char*> chars;
+    std::set<char> chars;
     for (int i = 0; i < 10; ++i) {
         const char* c = Visualizer::getCharForLabel(i);
         chars.insert(c);
