@@ -4,34 +4,34 @@
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│                     Application                       │
-│  main.cpp — CLI, interactive mode, benchmarks         │
+│                     Application                     │
+│  main.cpp — CLI, interactive mode, benchmarks       │
 ├─────────────────────────────────────────────────────┤
-│                   Core Library (lib)                   │
-│                                                       │
-│  ┌─────────────────────────────────────────────────┐ │
-│  │  Classifiers                                     │ │
-│  │  Knn (base)  →  KnnOptimized (KD-tree + threads)│ │
-│  └─────────────────────────────────────────────────┘ │
-│                                                       │
-│  ┌──────────────────┐ ┌────────────────────────────┐ │
-│  │  Data Structures  │ │  Dataset Utilities          │ │
-│  │  Point            │ │  generation, split, CSV,    │ │
-│  │  KD-tree (KdNode) │ │  normalize, metrics         │ │
-│  └──────────────────┘ └────────────────────────────┘ │
-│                                                       │
-│  ┌──────────────────┐ ┌────────────────────────────┐ │
-│  │  Visualization    │ │  Cross-Validation           │ │
-│  │  ANSI ASCII map   │ │  k-fold CV, optimal K      │ │
-│  └──────────────────┘ └────────────────────────────┘ │
-│                                                       │
-│  ┌─────────────────────────────────────────────────┐ │
-│  │  Benchmark Suite                                 │ │
-│  │  timing, speedup, CSV export                     │ │
-│  └─────────────────────────────────────────────────┘ │
+│                   Core Library (lib)                │
+│                                                     │
+│  ┌─────────────────────────────────────────────────┐│
+│  │  Classifiers                                    ││
+│  │  Knn (base)  →  KnnOptimized (KD-tree + threads)││
+│  └─────────────────────────────────────────────────┘│
+│                                                     │
+│  ┌──────────────────┐ ┌────────────────────────────┐│
+│  │  Data Structures │ │  Dataset Utilities         ││
+│  │  Point           │ │  generation, split, CSV,   ││
+│  │  KD-tree (KdNode)│ │  normalize, metrics        ││
+│  └──────────────────┘ └────────────────────────────┘│
+│                                                     │
+│  ┌──────────────────┐ ┌────────────────────────────┐│
+│  │  Visualization   │ │  Cross-Validation          ││
+│  │  ANSI ASCII map  │ │  k-fold CV, optimal K      ││
+│  └──────────────────┘ └────────────────────────────┘│
+│                                                     │
+│  ┌─────────────────────────────────────────────────┐│
+│  │  Benchmark Suite                                ││
+│  │  timing, speedup, CSV export                    ││
+│  └─────────────────────────────────────────────────┘│
 ├─────────────────────────────────────────────────────┤
-│                   Standard Library                     │
-│  STL — vector, memory, thread, chrono, random, I/O   │
+│                   Standard Library                  │
+│  STL — vector, memory, thread, chrono, random, I/O  │
 └─────────────────────────────────────────────────────┘
 ```
 
