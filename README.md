@@ -81,13 +81,35 @@ ctest --output-on-failure
 
 62+ unit tests covering all components.
 
-## Documentation
+## Design Highlights
 
-- [Architecture](ARCHITECTURE.md)
-- [Performance Benchmarks](PERFORMANCE.md)
-- [Code Examples](EXAMPLES.md)
-- [Visualization Guide](VISUALIZATION_GUIDE.md)
-- [Contributing](CONTRIBUTING.md)
+The KD-tree partitions points by median on alternating axes (x → y → x...).
+Search prunes branches when the splitting plane is farther than the current
+k-th neighbor — this gives O(log n) average lookup.
+
+The visualizer maps the 2D plane onto an ASCII grid. Each cell runs
+`predict(cell_center, k)` and gets rendered as a colored background block.
+Training points overlay with `●■▲♦★◆` symbols. Query points glow green `Q`,
+and k-neighbors are highlighted yellow `★`. Up to 8 classes get distinct
+ANSI colors; beyond that the palette cycles.
+
+Parallel prediction splits the query set into chunks, one per thread.
+Each thread reads the shared KD-tree without locking — the tree is
+immutable after construction, and every thread writes to its own slice
+of the result vector.
+
+The benchmark suite uses a `measure<Func>` template that runs any
+callable N times, then computes mean, min, max, and standard deviation
+in milliseconds.
+
+## Project Links
+
+- **Architecture**: [ARCHITECTURE.md](ARCHITECTURE.md)
+- **Performance**: [PERFORMANCE.md](PERFORMANCE.md)
+- **Examples**: [EXAMPLES.md](EXAMPLES.md)
+- **Visualization Guide**: [VISUALIZATION_GUIDE.md](VISUALIZATION_GUIDE.md)
+- **Contributing**: [CONTRIBUTING.md](CONTRIBUTING.md)
+- **CI**: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 
 ## License
 
