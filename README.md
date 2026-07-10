@@ -23,14 +23,22 @@ A K-Nearest Neighbors classifier implementation in C++20 with ASCII-based consol
   - Dataset statistics
   - Performance benchmarking
   
+- **Beautiful Console Visualization**
+  - ASCII graphics with full ANSI color support
+  - Multiple visualization modes:
+    - Decision boundaries
+    - Training data scatter plots
+    - Query point predictions
+    - K-nearest neighbors highlighting
+  - Interactive mode with real-time updates
+  - Support for multi-class datasets (up to 8+ classes)
+  - Configurable grid size and parameters
+  
 - **Testing & Quality**
-  - 50+ unit tests with Google Test
+  - 70+ unit tests with Google Test
   - Edge case coverage
   - Performance tests
-  
-- **Console Visualization** (Coming in Step 5)
-  - ASCII graphics with ANSI colors
-  - Interactive mode
+  - Visualization regression tests
 
 ## Requirements
 
@@ -102,11 +110,54 @@ cmake -DCMAKE_CXX_COMPILER=g++ ..
 
 ## Usage
 
-*(Will be updated as features are implemented)*
+The program offers multiple demo modes:
 
 ```bash
 ./bin/knn-classifier
 ```
+
+You'll be presented with options:
+1. **Full demo** - Complete walkthrough of all features
+2. **Visualization demo** - Focus on visualization capabilities
+3. **Interactive mode** - Enter custom query points for real-time classification
+4. **Quick test** - Fast demonstration
+
+### Interactive Mode
+
+In interactive mode, you can enter query points and see:
+- Real-time classification
+- K-nearest neighbors highlighted
+- Decision boundaries
+- Prediction confidence
+
+Example:
+```
+Enter X Y coordinates (or 'exit'): 10 10
+```
+
+The system will display a color-coded map showing:
+- 🟦🟥 **Decision boundaries** (background colors)
+- **●■▲** Training data points (colored symbols)
+- **Q** Your query point (green)
+- **★** K-nearest neighbors (yellow highlight)
+
+### Code Examples
+
+See [EXAMPLES.md](EXAMPLES.md) for detailed usage examples including:
+- Basic classification
+- Custom visualization configs
+- Multi-class datasets
+- Batch prediction
+- And more...
+
+### Visualization Guide
+
+See [VISUALIZATION_GUIDE.md](VISUALIZATION_GUIDE.md) for:
+- Detailed explanation of visualization modes
+- Color reference guide
+- Configuration tips
+- Interpretation guidelines
+- Troubleshooting
 
 ## Development Progress
 
@@ -134,17 +185,57 @@ cmake -DCMAKE_CXX_COMPILER=g++ ..
   - Performance benchmarking
   - Accuracy calculation and confusion matrix
   - Comprehensive unit tests
-- [ ] Step 5: Console visualization
-- [ ] Step 6: Interactive mode
+- [x] Step 5: Console visualization (Production version)
+  - ASCII graphics with full ANSI color support
+  - Multiple visualization modes:
+    - Decision boundary visualization
+    - Training data scatter plots
+    - Combined boundary + data view
+    - Query point highlighting
+    - K-nearest neighbors display
+  - Configurable grid size and parameters
+  - Legend and axis labeling
+  - Support for multi-class datasets
+  - Interactive visualization mode
+  - Beautiful color schemes for up to 8 classes
+- [x] Step 6: Interactive mode (Integrated in Step 5)
+  - Real-time query point input
+  - Dynamic visualization updates
+  - K-nearest neighbors highlighting
+  - Prediction confidence display
 - [ ] Step 7: Optimizations
 - [ ] Step 8: Final documentation
 
 ## Testing
 
-The project includes two levels of testing:
+The project includes comprehensive testing:
 
-1. **Unit Tests (Google Test)**: Run comprehensive tests with `ctest` or `./tests/tests`
-2. **Integration Tests**: Simple assert-based tests in `main.cpp`
+1. **Unit Tests (Google Test)**: 70+ tests covering all components
+   ```bash
+   cmake -DBUILD_TESTS=ON ..
+   cmake --build .
+   ctest --output-on-failure
+   ```
+
+2. **Integration Tests**: Real-world demonstrations in `main.cpp`
+
+3. **Test Coverage**:
+   - Point class: Distance calculations, operators
+   - Dataset: Generation, splitting, metrics
+   - KNN: Predictions, edge cases, accuracy
+   - Visualizer: All visualization modes, configs
+
+## What's Next
+
+- [x] Steps 1-6: Core functionality complete ✓
+- [ ] Step 7: Performance optimizations
+  - Spatial indexing (KD-tree)
+  - Parallel batch prediction
+  - Memory optimizations
+- [ ] Step 8: Final documentation
+  - Architecture diagrams
+  - API documentation
+  - Performance benchmarks
 
 ## License
 
