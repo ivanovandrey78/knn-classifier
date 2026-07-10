@@ -50,4 +50,5 @@ Makefile
 *.idb
 *.pdb
 
-# Cache.cache/
+# Cache
+.cache/
