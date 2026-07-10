@@ -101,8 +101,8 @@ BenchmarkResult benchmark::measure(
 
     for (double time : times) {
         sum += time;
-        minTime = std::min(minTime, time);
-        maxTime = std::max(maxTime, time);
+        minTime = (std::min)(minTime, time);
+        maxTime = (std::max)(maxTime, time);
     }
 
     double mean = sum / times.size();
