@@ -3,16 +3,14 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <numeric>
+#include <sstream>
 #include <dataset.hpp>
 #include <knn.hpp>
+#include <knn_optimized.hpp>
+#include <benchmark.hpp>
 #include <point.hpp>
 #include <visualizer.hpp>
-
-#ifdef _WIN32
-    #include <windows.h>
-    #include <fcntl.h>
-    #include <io.h>
-#endif
 
 /**
  * @brief Simple test function for Point distance calculation
@@ -28,12 +26,14 @@ void testPointDistance() {
     std::cout << "  ✓ Test 1: Distance between " << p1 << " and " << p2 << " = " << dist1
               << std::endl;
 
+    // Test 2: Same point
     Point p3(5.0, 7.0, 0);
     Point p4(5.0, 7.0, 1);
     double dist2 = p3.distanceTo(p4);
     assert(std::abs(dist2 - 0.0) < 1e-9 && "Test 2 failed: same point");
     std::cout << "  ✓ Test 2: Distance between same points = " << dist2 << std::endl;
 
+    // Test 3: Horizontal distance
     Point p5(0.0, 5.0, 0);
     Point p6(10.0, 5.0, 0);
     double dist3 = p5.distanceTo(p6);
@@ -51,6 +51,7 @@ void demoDatasetGeneration() {
     std::cout << "=== Dataset Generation Demo ===" << std::endl;
     std::cout << std::endl;
 
+    // Generate simple 2-class dataset
     std::cout << "Generating simple 2-class dataset..." << std::endl;
     auto dataset = Dataset::generateSimpleDataset(150, 42);
     std::cout << Dataset::getDatasetStats(dataset) << std::endl;
@@ -73,21 +74,25 @@ void demoKNNClassifier() {
     std::cout << "=== KNN Classifier Demo ===" << std::endl;
     std::cout << std::endl;
 
+    // Generate dataset
     std::cout << "Generating training dataset..." << std::endl;
     auto fullDataset = Dataset::generateSimpleDataset(200, 42);
 
+    // Split into train and test
     std::cout << "Splitting into train/test sets (80/20)..." << std::endl;
     auto [trainData, testData] = Dataset::trainTestSplit(fullDataset, 0.8, true, 42);
     std::cout << "  Training set: " << trainData.size() << " points" << std::endl;
     std::cout << "  Test set: " << testData.size() << " points" << std::endl;
     std::cout << std::endl;
 
+    // Create and train KNN classifier
     std::cout << "Training KNN classifier..." << std::endl;
     KNN classifier(trainData);
     std::cout << "  Classifier ready with " << classifier.size() << " training points"
               << std::endl;
     std::cout << std::endl;
 
+    // Test different k values
     std::cout << "Testing different k values:" << std::endl;
     std::vector<int> kValues = {1, 3, 5, 7, 10};
 
@@ -105,6 +110,7 @@ void demoKNNClassifier() {
     }
     std::cout << std::endl;
 
+    // Demo single prediction with confidence
     std::cout << "Single prediction examples:" << std::endl;
     std::vector<Point> queryPoints = {Point(5.0, 5.0), Point(15.0, 15.0), Point(10.0, 10.0)};
 
@@ -116,6 +122,7 @@ void demoKNNClassifier() {
     }
     std::cout << std::endl;
 
+    // Show k-nearest neighbors
     std::cout << "K-Nearest neighbors for Point(10.0, 10.0):" << std::endl;
     Point query(10.0, 10.0);
     auto neighbors = classifier.getKNearest(query, 5);
@@ -169,8 +176,10 @@ void demoDatasetUtilities() {
     std::cout << "=== Dataset Utilities Demo ===" << std::endl;
     std::cout << std::endl;
 
+    // Generate dataset
     auto dataset = Dataset::generateSimpleDataset(100, 42);
 
+    // Test CSV save/load
     std::cout << "Testing CSV save/load..." << std::endl;
     std::string filename = "demo_dataset.csv";
 
@@ -180,10 +189,12 @@ void demoDatasetUtilities() {
         auto loaded = Dataset::loadFromCSV(filename);
         std::cout << "  ✓ Loaded " << loaded.size() << " points from " << filename << std::endl;
 
+        // Cleanup
         std::remove(filename.c_str());
     }
     std::cout << std::endl;
 
+    // Test normalization
     std::cout << "Testing normalization..." << std::endl;
     auto [minXBefore, maxXBefore, minYBefore, maxYBefore] = Dataset::getBounds(dataset);
     std::cout << "  Before: X[" << minXBefore << ", " << maxXBefore << "], Y[" << minYBefore
@@ -195,6 +206,7 @@ void demoDatasetUtilities() {
               << maxYAfter << "]" << std::endl;
     std::cout << std::endl;
 
+    // Test confusion matrix
     std::cout << "Testing confusion matrix..." << std::endl;
     std::vector<int> predictions = {0, 0, 1, 1, 0, 1, 1, 0};
     std::vector<int> groundTruth = {0, 1, 1, 0, 0, 1, 1, 1};
@@ -214,6 +226,7 @@ void demoVisualization() {
     std::cout << "=== Visualization Demo ===" << std::endl;
     std::cout << std::endl;
 
+    // Generate dataset
     std::cout << "Generating dataset for visualization..." << std::endl;
     auto dataset = Dataset::generateSimpleDataset(50, 42);
     KNN classifier(dataset);
@@ -227,27 +240,32 @@ void demoVisualization() {
     std::cout << "\nPress Enter to see decision boundary visualization...";
     std::cin.get();
 
+    // 1. Decision boundary
     Visualizer::drawMap(classifier, config);
 
     std::cout << "\nPress Enter to see decision boundary with training data...";
     std::cin.get();
 
+    // 2. Decision boundary with data
     Visualizer::drawMapWithData(classifier, config);
 
     std::cout << "\nPress Enter to see training data scatter plot...";
     std::cin.get();
 
+    // 3. Data points only
     Visualizer::drawDataPoints(dataset, config);
 
     std::cout << "\nPress Enter to see query point prediction...";
     std::cin.get();
 
+    // 4. Query point
     Point query1(10.0, 10.0);
     Visualizer::drawMapWithQuery(classifier, query1, config);
 
     std::cout << "\nPress Enter to see k-nearest neighbors...";
     std::cin.get();
 
+    // 5. K-nearest neighbors
     Point query2(7.0, 8.0);
     Visualizer::drawMapWithNeighbors(classifier, query2, config);
 
@@ -282,6 +300,105 @@ void demoMultiClassVisualization() {
     std::cin.get();
 
     Visualizer::drawMapWithData(classifier, config);
+
+    std::cout << std::endl;
+}
+
+/**
+ * @brief Demo of optimizations
+ */
+void demoOptimizations() {
+    std::cout << "=== Optimization Demo ===" << std::endl;
+    std::cout << std::endl;
+
+    auto dataset = Dataset::generateSimpleDataset(200, 42);
+    auto [train, test] = Dataset::trainTestSplit(dataset, 0.8, true, 42);
+
+    std::cout << "Comparing Standard KNN vs Optimized KNN..." << std::endl;
+    std::cout << std::endl;
+
+    // Standard KNN
+    std::cout << "1. Standard KNN (linear search)..." << std::endl;
+    KNN standardKNN(train);
+    auto start = std::chrono::high_resolution_clock::now();
+    auto predictions1 = standardKNN.predictBatch(test, 5);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "   Time: " << duration1 << " ms" << std::endl;
+
+    // Optimized KNN with KD-tree
+    std::cout << "\n2. Optimized KNN (KD-tree)..." << std::endl;
+    KNNOptimized optimizedKNN(train, true);
+    start = std::chrono::high_resolution_clock::now();
+    auto predictions2 = optimizedKNN.predictBatch(test, 5);
+    end = std::chrono::high_resolution_clock::now();
+    auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "   Time: " << duration2 << " ms" << std::endl;
+    std::cout << "   Speedup: " << std::fixed << std::setprecision(1)
+              << (static_cast<double>(duration1) / duration2) << "x" << std::endl;
+
+    // Parallel prediction
+    std::cout << "\n3. Parallel prediction (4 threads)..." << std::endl;
+    start = std::chrono::high_resolution_clock::now();
+    auto predictions3 = optimizedKNN.predictBatchParallel(test, 5, 4);
+    end = std::chrono::high_resolution_clock::now();
+    auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    std::cout << "   Time: " << duration3 << " ms" << std::endl;
+    std::cout << "   Speedup vs standard: " << std::fixed << std::setprecision(1)
+              << (static_cast<double>(duration1) / duration3) << "x" << std::endl;
+
+    // Weighted strategies
+    std::cout << "\n4. Testing weight strategies..." << std::endl;
+    
+    std::vector<std::pair<std::string, WeightStrategy>> strategies = {
+        {"Uniform", WeightStrategy::UNIFORM},
+        {"Inverse Distance", WeightStrategy::INVERSE_DISTANCE},
+        {"Gaussian", WeightStrategy::GAUSSIAN}
+    };
+
+    for (const auto& [name, strategy] : strategies) {
+        optimizedKNN.setWeightStrategy(strategy);
+        auto preds = optimizedKNN.predictBatch(test, 5);
+        
+        std::vector<int> groundTruth;
+        for (const auto& p : test) {
+            groundTruth.push_back(p.label);
+        }
+        
+        double acc = Dataset::calculateAccuracy(preds, groundTruth);
+        std::cout << "   " << std::setw(20) << std::left << name << ": " 
+                  << std::fixed << std::setprecision(1) << acc << "%" << std::endl;
+    }
+
+    std::cout << std::endl;
+}
+
+/**
+ * @brief Demo of cross-validation
+ */
+void demoCrossValidation() {
+    std::cout << "=== Cross-Validation Demo ===" << std::endl;
+    std::cout << std::endl;
+
+    auto dataset = Dataset::generateSimpleDataset(150, 42);
+
+    std::cout << "Performing 5-fold cross-validation..." << std::endl;
+    auto accuracies = CrossValidation::kFoldCV(dataset, 5, 5, 42);
+
+    std::cout << "\nFold Results:" << std::endl;
+    for (size_t i = 0; i < accuracies.size(); ++i) {
+        std::cout << "  Fold " << (i + 1) << ": " << std::fixed << std::setprecision(2)
+                  << accuracies[i] << "%" << std::endl;
+    }
+
+    double mean = std::accumulate(accuracies.begin(), accuracies.end(), 0.0) / accuracies.size();
+    std::cout << "\nMean Accuracy: " << std::fixed << std::setprecision(2) << mean << "%"
+              << std::endl;
+
+    std::cout << "\nFinding optimal k..." << std::endl;
+    auto [bestK, bestAcc] = CrossValidation::findOptimalK(dataset, 15, 5);
+    std::cout << "Best k: " << bestK << " with accuracy: " << std::fixed << std::setprecision(2)
+              << bestAcc << "%" << std::endl;
 
     std::cout << std::endl;
 }
@@ -336,66 +453,74 @@ void interactiveVisualization() {
 }
 
 int main() {
-    #ifdef _WIN32
-        SetConsoleOutputCP(CP_UTF8);
-        SetConsoleCP(CP_UTF8);
-        
-        std::ios::sync_with_stdio(false);
-        
-        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
-        DWORD dwMode = 0;
-        GetConsoleMode(hOut, &dwMode);
-        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
-        SetConsoleMode(hOut, dwMode);
-        
-        CONSOLE_FONT_INFOEX fontInfo = {};
-        fontInfo.cbSize = sizeof(fontInfo);
-        GetCurrentConsoleFontEx(hOut, FALSE, &fontInfo);
-        wcscpy_s(fontInfo.FaceName, L"Consolas");
-        SetCurrentConsoleFontEx(hOut, FALSE, &fontInfo);
-    #endif
-
     std::cout << "╔════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  KNN Classifier with Console Visualization     ║" << std::endl;
+    std::cout << "║  KNN Classifier with Console Visualization    ║" << std::endl;
+    std::cout << "║  Production-Ready Implementation v1.0         ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════╝" << std::endl;
     std::cout << std::endl;
 
     std::cout << "Select demo mode:" << std::endl;
     std::cout << "1. Full demo (all features)" << std::endl;
     std::cout << "2. Visualization demo" << std::endl;
-    std::cout << "3. Interactive mode" << std::endl;
-    std::cout << "4. Quick test" << std::endl;
-    std::cout << "\nChoice (1-4): ";
+    std::cout << "3. Optimization demo (KD-tree, parallel, weighted)" << std::endl;
+    std::cout << "4. Cross-validation demo" << std::endl;
+    std::cout << "5. Benchmark suite" << std::endl;
+    std::cout << "6. Interactive mode" << std::endl;
+    std::cout << "7. Quick test" << std::endl;
+    std::cout << "\nChoice (1-7): ";
 
     int choice;
     std::cin >> choice;
-    std::cin.ignore();
+    std::cin.ignore();  // Clear newline
 
     switch (choice) {
         case 1:
+            // Full demo
             testPointDistance();
             demoDatasetGeneration();
             demoKNNClassifier();
+            demoOptimizations();
+            demoCrossValidation();
             demoDatasetUtilities();
-            benchmarkKNN();
             demoVisualization();
             demoMultiClassVisualization();
+            std::cout << "\nPress Enter to run benchmarks...";
+            std::cin.get();
+            Benchmark::runFullSuite(1000, 200);
             break;
 
         case 2:
+            // Visualization only
             demoVisualization();
             demoMultiClassVisualization();
             break;
 
         case 3:
-            interactiveVisualization();
+            // Optimizations
+            demoOptimizations();
             break;
 
         case 4:
+            // Cross-validation
+            demoCrossValidation();
+            break;
+
+        case 5:
+            // Benchmarks
+            Benchmark::runFullSuite(2000, 400);
+            break;
+
+        case 6:
+            // Interactive mode
+            interactiveVisualization();
+            break;
+
+        case 7:
+            // Quick test
             testPointDistance();
             {
                 auto dataset = Dataset::generateSimpleDataset(50, 42);
-                KNN classifier(dataset);
+                KNNOptimized classifier(dataset, true);
                 VisualizerConfig config;
                 config.gridSize = 35;
                 config.k = 5;
@@ -410,8 +535,9 @@ int main() {
     }
 
     std::cout << "\n╔════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  All demos completed successfully! ✓✓✓         ║" << std::endl;
+    std::cout << "║  All demos completed successfully! ✓✓✓       ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════╝" << std::endl;
 
     return 0;
 }
+
