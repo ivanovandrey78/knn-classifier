@@ -14,6 +14,8 @@ add_executable(tests
     dataset_ut.cpp
     knn_ut.cpp
     visualizer_ut.cpp
+    kdtree_ut.cpp
+    knn_optimized_ut.cpp
 )
 
 target_link_libraries(tests
