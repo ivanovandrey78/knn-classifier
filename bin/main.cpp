@@ -8,6 +8,12 @@
 #include <point.hpp>
 #include <visualizer.hpp>
 
+#ifdef _WIN32
+    #include <windows.h>
+    #include <fcntl.h>
+    #include <io.h>
+#endif
+
 /**
  * @brief Simple test function for Point distance calculation
  */
@@ -22,14 +28,12 @@ void testPointDistance() {
     std::cout << "  ✓ Test 1: Distance between " << p1 << " and " << p2 << " = " << dist1
               << std::endl;
 
-    // Test 2: Same point
     Point p3(5.0, 7.0, 0);
     Point p4(5.0, 7.0, 1);
     double dist2 = p3.distanceTo(p4);
     assert(std::abs(dist2 - 0.0) < 1e-9 && "Test 2 failed: same point");
     std::cout << "  ✓ Test 2: Distance between same points = " << dist2 << std::endl;
 
-    // Test 3: Horizontal distance
     Point p5(0.0, 5.0, 0);
     Point p6(10.0, 5.0, 0);
     double dist3 = p5.distanceTo(p6);
@@ -47,7 +51,6 @@ void demoDatasetGeneration() {
     std::cout << "=== Dataset Generation Demo ===" << std::endl;
     std::cout << std::endl;
 
-    // Generate simple 2-class dataset
     std::cout << "Generating simple 2-class dataset..." << std::endl;
     auto dataset = Dataset::generateSimpleDataset(150, 42);
     std::cout << Dataset::getDatasetStats(dataset) << std::endl;
@@ -70,25 +73,21 @@ void demoKNNClassifier() {
     std::cout << "=== KNN Classifier Demo ===" << std::endl;
     std::cout << std::endl;
 
-    // Generate dataset
     std::cout << "Generating training dataset..." << std::endl;
     auto fullDataset = Dataset::generateSimpleDataset(200, 42);
 
-    // Split into train and test
     std::cout << "Splitting into train/test sets (80/20)..." << std::endl;
     auto [trainData, testData] = Dataset::trainTestSplit(fullDataset, 0.8, true, 42);
     std::cout << "  Training set: " << trainData.size() << " points" << std::endl;
     std::cout << "  Test set: " << testData.size() << " points" << std::endl;
     std::cout << std::endl;
 
-    // Create and train KNN classifier
     std::cout << "Training KNN classifier..." << std::endl;
     KNN classifier(trainData);
     std::cout << "  Classifier ready with " << classifier.size() << " training points"
               << std::endl;
     std::cout << std::endl;
 
-    // Test different k values
     std::cout << "Testing different k values:" << std::endl;
     std::vector<int> kValues = {1, 3, 5, 7, 10};
 
@@ -106,7 +105,6 @@ void demoKNNClassifier() {
     }
     std::cout << std::endl;
 
-    // Demo single prediction with confidence
     std::cout << "Single prediction examples:" << std::endl;
     std::vector<Point> queryPoints = {Point(5.0, 5.0), Point(15.0, 15.0), Point(10.0, 10.0)};
 
@@ -118,7 +116,6 @@ void demoKNNClassifier() {
     }
     std::cout << std::endl;
 
-    // Show k-nearest neighbors
     std::cout << "K-Nearest neighbors for Point(10.0, 10.0):" << std::endl;
     Point query(10.0, 10.0);
     auto neighbors = classifier.getKNearest(query, 5);
@@ -172,10 +169,8 @@ void demoDatasetUtilities() {
     std::cout << "=== Dataset Utilities Demo ===" << std::endl;
     std::cout << std::endl;
 
-    // Generate dataset
     auto dataset = Dataset::generateSimpleDataset(100, 42);
 
-    // Test CSV save/load
     std::cout << "Testing CSV save/load..." << std::endl;
     std::string filename = "demo_dataset.csv";
 
@@ -185,12 +180,10 @@ void demoDatasetUtilities() {
         auto loaded = Dataset::loadFromCSV(filename);
         std::cout << "  ✓ Loaded " << loaded.size() << " points from " << filename << std::endl;
 
-        // Cleanup
         std::remove(filename.c_str());
     }
     std::cout << std::endl;
 
-    // Test normalization
     std::cout << "Testing normalization..." << std::endl;
     auto [minXBefore, maxXBefore, minYBefore, maxYBefore] = Dataset::getBounds(dataset);
     std::cout << "  Before: X[" << minXBefore << ", " << maxXBefore << "], Y[" << minYBefore
@@ -202,7 +195,6 @@ void demoDatasetUtilities() {
               << maxYAfter << "]" << std::endl;
     std::cout << std::endl;
 
-    // Test confusion matrix
     std::cout << "Testing confusion matrix..." << std::endl;
     std::vector<int> predictions = {0, 0, 1, 1, 0, 1, 1, 0};
     std::vector<int> groundTruth = {0, 1, 1, 0, 0, 1, 1, 1};
@@ -215,28 +207,210 @@ void demoDatasetUtilities() {
     std::cout << std::endl;
 }
 
+/**
+ * @brief Demo of visualization capabilities
+ */
+void demoVisualization() {
+    std::cout << "=== Visualization Demo ===" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "Generating dataset for visualization..." << std::endl;
+    auto dataset = Dataset::generateSimpleDataset(50, 42);
+    KNN classifier(dataset);
+
+    VisualizerConfig config;
+    config.gridSize = 40;
+    config.k = 5;
+    config.useColors = true;
+    config.showLegend = true;
+
+    std::cout << "\nPress Enter to see decision boundary visualization...";
+    std::cin.get();
+
+    Visualizer::drawMap(classifier, config);
+
+    std::cout << "\nPress Enter to see decision boundary with training data...";
+    std::cin.get();
+
+    Visualizer::drawMapWithData(classifier, config);
+
+    std::cout << "\nPress Enter to see training data scatter plot...";
+    std::cin.get();
+
+    Visualizer::drawDataPoints(dataset, config);
+
+    std::cout << "\nPress Enter to see query point prediction...";
+    std::cin.get();
+
+    Point query1(10.0, 10.0);
+    Visualizer::drawMapWithQuery(classifier, query1, config);
+
+    std::cout << "\nPress Enter to see k-nearest neighbors...";
+    std::cin.get();
+
+    Point query2(7.0, 8.0);
+    Visualizer::drawMapWithNeighbors(classifier, query2, config);
+
+    std::cout << std::endl;
+}
+
+/**
+ * @brief Demo of multi-class visualization
+ */
+void demoMultiClassVisualization() {
+    std::cout << "=== Multi-Class Visualization Demo ===" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "Generating 4-class dataset..." << std::endl;
+
+    std::vector<ClusterConfig> configs = {
+        ClusterConfig(3.0, 3.0, 0.8, 0, 40),    // Bottom-left
+        ClusterConfig(12.0, 3.0, 0.8, 1, 40),   // Bottom-right
+        ClusterConfig(3.0, 12.0, 0.8, 2, 40),   // Top-left
+        ClusterConfig(12.0, 12.0, 0.8, 3, 40)   // Top-right
+    };
+
+    auto dataset = Dataset::generateClusters(configs, 42);
+    KNN classifier(dataset);
+
+    VisualizerConfig config;
+    config.gridSize = 50;
+    config.k = 7;
+    config.useColors = true;
+
+    std::cout << "\nPress Enter to see 4-class decision boundaries...";
+    std::cin.get();
+
+    Visualizer::drawMapWithData(classifier, config);
+
+    std::cout << std::endl;
+}
+
+/**
+ * @brief Interactive visualization mode
+ */
+void interactiveVisualization() {
+    std::cout << "=== Interactive Visualization ===" << std::endl;
+    std::cout << std::endl;
+
+    auto dataset = Dataset::generateSimpleDataset(80, 123);
+    KNN classifier(dataset);
+
+    VisualizerConfig config;
+    config.gridSize = 40;
+    config.k = 5;
+    config.useColors = true;
+
+    auto [minX, maxX, minY, maxY] = Dataset::getBounds(dataset);
+
+    std::cout << "Dataset bounds: X[" << minX << ", " << maxX << "], Y[" << minY << ", " << maxY
+              << "]" << std::endl;
+    std::cout << "\nEnter query points to visualize predictions." << std::endl;
+    std::cout << "Type 'exit' to quit.\n" << std::endl;
+
+    std::string input;
+    while (true) {
+        std::cout << "Enter X Y coordinates (or 'exit'): ";
+        std::getline(std::cin, input);
+
+        if (input == "exit" || input == "quit" || input == "q") {
+            break;
+        }
+
+        std::istringstream iss(input);
+        double x, y;
+
+        if (iss >> x >> y) {
+            Point query(x, y);
+
+            Visualizer::clearScreen();
+            Visualizer::drawMapWithNeighbors(classifier, query, config);
+
+            std::cout << "\n";
+        } else {
+            std::cout << "Invalid input. Please enter two numbers (x y)." << std::endl;
+        }
+    }
+
+    std::cout << "\nExiting interactive mode." << std::endl;
+}
+
 int main() {
+    #ifdef _WIN32
+        SetConsoleOutputCP(CP_UTF8);
+        SetConsoleCP(CP_UTF8);
+        
+        std::ios::sync_with_stdio(false);
+        
+        HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+        DWORD dwMode = 0;
+        GetConsoleMode(hOut, &dwMode);
+        dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+        SetConsoleMode(hOut, dwMode);
+        
+        CONSOLE_FONT_INFOEX fontInfo = {};
+        fontInfo.cbSize = sizeof(fontInfo);
+        GetCurrentConsoleFontEx(hOut, FALSE, &fontInfo);
+        wcscpy_s(fontInfo.FaceName, L"Consolas");
+        SetCurrentConsoleFontEx(hOut, FALSE, &fontInfo);
+    #endif
+
     std::cout << "╔════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  KNN Classifier with Console Visualization    ║" << std::endl;
-    std::cout << "║  Production-Ready Implementation              ║" << std::endl;
+    std::cout << "║  KNN Classifier with Console Visualization     ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════╝" << std::endl;
     std::cout << std::endl;
 
-    // Step 2: Test Point class
-    testPointDistance();
+    std::cout << "Select demo mode:" << std::endl;
+    std::cout << "1. Full demo (all features)" << std::endl;
+    std::cout << "2. Visualization demo" << std::endl;
+    std::cout << "3. Interactive mode" << std::endl;
+    std::cout << "4. Quick test" << std::endl;
+    std::cout << "\nChoice (1-4): ";
 
-    // Step 3: Dataset generation
-    demoDatasetGeneration();
+    int choice;
+    std::cin >> choice;
+    std::cin.ignore();
 
-    // Step 4: KNN classifier
-    demoKNNClassifier();
+    switch (choice) {
+        case 1:
+            testPointDistance();
+            demoDatasetGeneration();
+            demoKNNClassifier();
+            demoDatasetUtilities();
+            benchmarkKNN();
+            demoVisualization();
+            demoMultiClassVisualization();
+            break;
 
-    // Additional demos
-    demoDatasetUtilities();
-    benchmarkKNN();
+        case 2:
+            demoVisualization();
+            demoMultiClassVisualization();
+            break;
 
-    std::cout << "╔════════════════════════════════════════════════╗" << std::endl;
-    std::cout << "║  All demos completed successfully! ✓✓✓       ║" << std::endl;
+        case 3:
+            interactiveVisualization();
+            break;
+
+        case 4:
+            testPointDistance();
+            {
+                auto dataset = Dataset::generateSimpleDataset(50, 42);
+                KNN classifier(dataset);
+                VisualizerConfig config;
+                config.gridSize = 35;
+                config.k = 5;
+                Visualizer::drawMapWithData(classifier, config);
+            }
+            break;
+
+        default:
+            std::cout << "Invalid choice. Running quick test..." << std::endl;
+            testPointDistance();
+            break;
+    }
+
+    std::cout << "\n╔════════════════════════════════════════════════╗" << std::endl;
+    std::cout << "║  All demos completed successfully! ✓✓✓         ║" << std::endl;
     std::cout << "╚════════════════════════════════════════════════╝" << std::endl;
 
     return 0;
