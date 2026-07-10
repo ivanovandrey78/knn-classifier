@@ -5,6 +5,11 @@
 #include <iostream>
 #include <numeric>
 #include <sstream>
+
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
 #include <dataset.hpp>
 #include <knn.hpp>
 #include <knn_optimized.hpp>
@@ -459,6 +464,15 @@ void interactiveVisualization() {
 }
 
 int main() {
+#ifdef _WIN32
+    SetConsoleOutputCP(CP_UTF8);
+    HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD dwMode = 0;
+    GetConsoleMode(hOut, &dwMode);
+    dwMode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+    SetConsoleMode(hOut, dwMode);
+#endif
+
     std::cout << "╔══════════════════════════════════════════╗"
               << std::endl;
     std::cout << "║  Knn Classifier + Console Visualization  ║"
